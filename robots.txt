@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://بركةه والتنين الصيني.netlify.app/sitemap.xml

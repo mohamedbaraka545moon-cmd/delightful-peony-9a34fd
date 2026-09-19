@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بركة والتنين الصيني | Baraka & The Chinese Dragon</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'Tahoma', sans-serif; }
+:root { --gold: #D4AF37; --black: #0A0A0A; --red: #DE2910; --blue: #003366; --cgold: #FFDE00; }
+body { background: linear-gradient(135deg, #0A0A0A, #1A1A1A); color: #F5F5F5; line-height: 1.7; }
+header { background: linear-gradient(90deg, #003366, #0A0A0A, #DE2910); padding: 18px 5%; position: sticky; top: 0; z-index: 1000; border-bottom: 3px solid #D4AF37; }
+.nav { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; flex-wrap: wrap; gap: 15px; }
+.logos { display: flex; gap: 10px; align-items: center; }
+.logo { width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; border: 2px solid #D4AF37; }
+.lg-eg { background: linear-gradient(135deg, #003366, #C09B30); }
+.lg-cn { background: linear-gradient(135deg, #DE2910, #FFDE00); }
+.brand h1 { color: #D4AF37; font-size: 1.5em; text-shadow: 0 0 15px rgba(212,175,55,0.5); }
+.brand h1 span { color: #DE2910; }
+.brand p { font-size: 0.7em; color: #AAA; letter-spacing: 2px; }
+nav ul { display: flex; list-style: none; gap: 20px; flex-wrap: wrap; }
+nav a { color: #F5F5F5; text-decoration: none; font-size: 0.95em; transition: color 0.3s; }
+nav a:hover { color: #D4AF37; }
+.hero { min-height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 60px 5%; background: radial-gradient(ellipse, rgba(212,175,55,0.12), transparent 70%); position: relative; overflow: hidden; }
+.hero::before { content: '𓂀'; position: absolute; top: 10%; right: 5%; font-size: 15em; color: rgba(212,175,55,0.03); }
+.hero::after { content: '🐉'; position: absolute; bottom: 10%; left: 5%; font-size: 15em; opacity: 0.03; }
+.symbols { display: flex; gap: 25px; font-size: 3.5em; margin-bottom: 30px; }
+.symbols span { filter: drop-shadow(0 0 15px rgba(212,175,55,0.6)); animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.hero h2 { font-size: 3.5em; margin-bottom: 15px; background: linear-gradient(90deg, #C09B30, #D4AF37, #FFDE00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; position: relative; z-index: 2; }
+.hero h2 .dragon { color: #DE2910; -webkit-text-fill-color: #DE2910; }
+.hero .tagline { font-size: 1.4em; color: #D4AF37; margin-bottom: 20px; position: relative; z-index: 2; }
+.hero .subtitle { font-size: 1.1em; color: #AAA; margin-bottom: 30px; max-width: 800px; position: relative; z-index: 2; }
+.founder-box { background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(222,41,16,0.15)); border: 2px solid #D4AF37; border-radius: 15px; padding: 25px 40px; margin: 30px auto; max-width: 700px; box-shadow: 0 0 30px rgba(212,175,55,0.3); position: relative; z-index: 2; }
+.founder-box .lbl { color: #AAA; font-size: 0.9em; letter-spacing: 2px; margin-bottom: 10px; }
+.founder-box .nm { font-size: 1.8em; background: linear-gradient(90deg, #D4AF37, #FFDE00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; margin-bottom: 8px; }
+.founder-box .ttl { color: #FFDE00; font-size: 1.1em; font-style: italic; }
+.btn { padding: 15px 40px; border: 2px solid #D4AF37; background: transparent; color: #D4AF37; font-size: 1.05em; font-weight: 600; cursor: pointer; transition: all 0.3s; border-radius: 8px; text-decoration: none; display: inline-block; }
+.btn:hover { background: #D4AF37; color: #0A0A0A; transform: translateY(-3px); }
+.btn-p { background: linear-gradient(90deg, #D4AF37, #B8860B); color: #0A0A0A; }
+.btns { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-top: 30px; position: relative; z-index: 2; }
+.bar { background: linear-gradient(90deg, rgba(0,51,102,0.4), rgba(10,10,10,0.6), rgba(222,41,16,0.4)); border-top: 1px solid #D4AF37; border-bottom: 1px solid #D4AF37; padding: 20px; text-align: center; color: #D4AF37; font-style: italic; }
+section { padding: 80px 5%; max-width: 1400px; margin: 0 auto; }
+.stitle { text-align: center; font-size: 2.5em; margin-bottom: 15px; color: #D4AF37; }
+.stitle::after { content: ''; display: block; width: 120px; height: 3px; background: linear-gradient(90deg, #C09B30, #DE2910); margin: 15px auto 0; }
+.ssub { text-align: center; color: #AAA; margin-bottom: 50px; }
+.story { background: linear-gradient(135deg, rgba(0,51,102,0.15), rgba(222,41,16,0.15)); border: 2px solid #D4AF37; border-radius: 20px; padding: 50px; margin-top: 40px; position: relative; }
+.story::before { content: '📜'; position: absolute; top: -25px; right: 40px; font-size: 3em; background: #0A0A0A; padding: 0 15px; }
+.sgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+.stxt h3 { color: #D4AF37; font-size: 1.8em; margin-bottom: 20px; }
+.stxt p { margin-bottom: 15px; line-height: 1.9; }
+.stxt strong { color: #FFDE00; }
+.svis { text-align: center; font-size: 8em; }
+.svis .drg { filter: drop-shadow(0 0 30px rgba(222,41,16,0.7)); animation: float 3s ease-in-out infinite; }
+.prods { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 40px; margin-top: 40px; }
+.pcard { background: linear-gradient(135deg, rgba(26,26,26,0.95), rgba(10,10,10,0.95)); border: 2px solid #D4AF37; border-radius: 15px; padding: 40px 30px; transition: all 0.4s; }
+.pcard:hover { transform: translateY(-10px); box-shadow: 0 20px 50px rgba(212,175,55,0.35); }
+.pbadge { display: inline-block; padding: 6px 18px; border-radius: 20px; font-size: 0.85em; font-weight: 600; margin-bottom: 20px; color: white; }
+.bv1 { background: linear-gradient(90deg, #003366, #C09B30); }
+.bv2 { background: linear-gradient(90deg, #DE2910, #FFDE00); }
+.pcard h3 { font-size: 2em; color: #D4AF37; margin-bottom: 10px; }
+.ptag { color: #AAA; margin-bottom: 25px; font-style: italic; }
+.pfeat { list-style: none; margin-bottom: 30px; }
+.pfeat li { padding: 10px 0; border-bottom: 1px solid rgba(212,175,55,0.15); }
+.pfeat li::before { content: '✓ '; color: #D4AF37; font-weight: bold; }
+.pstats { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+.sbox { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid rgba(212,175,55,0.2); }
+.sbox .v { font-size: 1.8em; color: #D4AF37; font-weight: bold; }
+.sbox .l { font-size: 0.8em; color: #AAA; }
+.calc { background: linear-gradient(135deg, rgba(26,26,26,0.95), rgba(10,10,10,0.95)); border: 2px solid #D4AF37; border-radius: 20px; padding: 50px; margin-top: 40px; }
+.cstep { margin-bottom: 40px; }
+.cstep h4 { color: #D4AF37; font-size: 1.3em; margin-bottom: 20px; }
+.snum { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #D4AF37, #B8860B); color: #0A0A0A; font-weight: bold; margin-left: 10px; }
+.opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+.opt { background: rgba(0,0,0,0.5); border: 2px solid rgba(212,175,55,0.3); border-radius: 10px; padding: 20px; cursor: pointer; transition: all 0.3s; text-align: center; }
+.opt:hover { border-color: #D4AF37; background: rgba(212,175,55,0.1); }
+.opt.sel { border-color: #FFDE00; background: rgba(255,222,0,0.15); box-shadow: 0 0 25px rgba(255,222,0,0.4); }
+.opt .i { font-size: 2.5em; margin-bottom: 10px; }
+.opt .n { font-weight: 600; margin-bottom: 5px; }
+.opt .d { font-size: 0.85em; color: #AAA; }
+.cres { background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(222,41,16,0.1)); border: 2px dashed #D4AF37; border-radius: 15px; padding: 30px; margin-top: 30px; display: none; }
+.cres.vis { display: block; }
+.rhdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+.rhdr h3 { color: #D4AF37; }
+.rgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
+.ritem { background: rgba(0,0,0,0.6); padding: 20px; border-radius: 10px; border-right: 4px solid #D4AF37; }
+.ritem .l { color: #AAA; font-size: 0.9em; margin-bottom: 5px; }
+.ritem .v { color: #FFDE00; font-size: 1.4em; font-weight: bold; }
+.cform { background: linear-gradient(135deg, rgba(26,26,26,0.95), rgba(10,10,10,0.95)); border: 2px solid #D4AF37; border-radius: 20px; padding: 50px; margin-top: 40px; }
+.fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+.fg { display: flex; flex-direction: column; }
+.fg.full { grid-column: 1 / -1; }
+.fg label { color: #D4AF37; margin-bottom: 8px; font-weight: 600; }
+.fg input, .fg textarea, .fg select { padding: 12px 15px; background: rgba(0,0,0,0.5); border: 2px solid rgba(212,175,55,0.3); border-radius: 8px; color: #F5F5F5; font-size: 1em; font-family: inherit; }
+.fg input:focus, .fg textarea:focus, .fg select:focus { outline: none; border-color: #D4AF37; }
+.fg textarea { resize: vertical; min-height: 120px; }
+footer { background: linear-gradient(90deg, #003366, #0A0A0A, #DE2910); padding: 50px 5% 20px; border-top: 3px solid #D4AF37; margin-top: 80px; }
+.fcontent { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 30px; }
+.fcol h4 { color: #D4AF37; margin-bottom: 20px; }
+.fcol p, .fcol a { color: #AAA; text-decoration: none; display: block; margin-bottom: 10px; }
+.fcol a:hover { color: #D4AF37; }
+.fsym { display: flex; justify-content: center; gap: 20px; margin-bottom: 15px; font-size: 2.5em; }
+.fbot { text-align: center; padding-top: 30px; border-top: 1px solid rgba(212,175,55,0.2); color: #AAA; }
+@media (max-width: 768px) {
+.hero h2 { font-size: 2em; }
+nav ul { display: none; }
+.fgrid { grid-template-columns: 1fr; }
+.prods { grid-template-columns: 1fr; }
+.calc, .cform, .story { padding: 25px; }
+.stitle { font-size: 1.8em; }
+.sgrid { grid-template-columns: 1fr; }
+.svis { font-size: 5em; }
+.founder-box { padding: 20px; }
+.founder-box .nm { font-size: 1.3em; }
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="nav">
+<div class="logos">
+<div class="logo lg-eg">𓂀</div>
+<div class="logo lg-cn">🐉</div>
+<div class="brand">
+<h1>بركة <span>والتنين الصيني</span></h1>
+<p>BARAKA & THE CHINESE DRAGON</p>
+</div>
+</div>
+<nav>
+<ul>
+<li><a href="#story">القصة</a></li>
+<li><a href="#products">المنتجات</a></li>
+<li><a href="#calculator">الحاسبة</a></li>
+<li><a href="#contact">تواصل</a></li>
+</ul>
+</nav>
+</div>
+</header>
+
+<section class="hero">
+<div class="symbols"><span>𓂀</span><span>⚔️</span><span>🐉</span></div>
+<h2>بركة <span class="dragon">والتنين الصيني</span></h2>
+<p class="tagline">⚡ تحالف الحضارتين لكسر احتكار التشفير الغربي ⚡</p>
+<p class="subtitle">نظام تشفير رياضي غير احتمالي، مقاوم للحوسبة الكمومية، مبني على نظرية الأعداد التحليلية ودالة جاما. شرط عدم التكرار R = 0.</p>
+<div class="founder-box">
+<div class="lbl">✦ الـمــؤســس ✦</div>
+<div class="nm">أ. محمد عيد عبد العليم بركة</div>
+<div class="ttl">أستاذ الرياضيات — باحث في نظرية الأعداد والتشفير التحليلي</div>
+</div>
+<div class="btns">
+<a href="#products" class="btn btn-p">🐉 استكشف المنتجات</a>
+<a href="#calculator" class="btn">⚔️ احسب احتياجك</a>
+</div>
+</section>
+
+<div class="bar">"حين يلتقي عقل الرياضيات المصري بروح التنين الصيني، يولد نظام لا يُقهر"</div>
+
+<section id="story">
+<h2 class="stitle">قصة بركة والتنين</h2>
+<p class="ssub">كيف وُلد التحالف المصري-الصيني</p>
+<div class="story">
+<div class="sgrid">
+<div class="stxt">
+<h3>🐉 حكاية البداية</h3>
+<p>في زمنٍ تسيطر فيه الشركات الغربية على مفاتيح الأمن السيادي، قام <strong>الأستاذ/ محمد عيد عبد العليم بركة</strong> من مصر بتأليف نظام تشفير جديد لا يعتمد على التحليل إلى عوامل ولا على اللوغاريتمات المتقطعة.</p>
+<p>النظام وُلد من رحم <strong>معادلة ضمنية واحدة</strong> تجمع مبرهنة ويلسون ودالة جاما، وتفرض <strong>شرط عدم التكرار R = 0</strong>.</p>
+<p>لكن الرياضيات وحدها لا تكفي. كانت هناك حاجة إلى <strong>روح التنين الصيني</strong> — القوة والانضباط والصبر الاستراتيجي.</p>
+<p style="color:#FFDE00;font-weight:600;">هكذا وُلد "بركة والتنين الصيني" — عقل مصري، وروح صينية، وسلاح رياضي واحد.</p>
+</div>
+<div class="svis"><div class="drg">🐉</div></div>
+</div>
+</div>
+</section>
+
+<section id="products">
+<h2 class="stitle">منتجاتنا</h2>
+<p class="ssub">نظامان متكاملان لتشفير البيانات السيادية</p>
+<div class="prods">
+<div class="pcard">
+<span class="pbadge bv1">🇪🇬 الإصدار المصري</span>
+<h3>PFE 1.0</h3>
+<p class="ptag">الأساس الرياضي — البصمة الأولية</p>
+<ul class="pfeat">
+<li>معادلة ضمنية مستمرة</li>
+<li>مبرهنة ويلسون + دالة جاما</li>
+<li>شرط R = 0</li>
+<li>مقاوم للهجمات الإحصائية</li>
+<li>مفاتيح حتى 2048 بت</li>
+</ul>
+<div class="pstats">
+<div class="sbox"><div class="v">512</div><div class="l">بت أمان كلاسيكي</div></div>
+<div class="sbox"><div class="v">20.5s</div><div class="l">زمن 2048 بت</div></div>
+</div>
+<button class="btn btn-p" onclick="selectProduct('PFE 1.0')" style="width:100%;">اطلب عرضاً</button>
+</div>
+
+<div class="pcard">
+<span class="pbadge bv2">🇨🇳 الإصدار الصيني</span>
+<h3>PFE 3D v2.0</h3>
+<p class="ptag">التوسع الثلاثي — الالتواء الحلزوني</p>
+<ul class="pfeat">
+<li>بعد ثالث مستخرج</li>
+<li>مفتاح مزدوج الطبقات</li>
+<li>مفتاح اتجاهي</li>
+<li>ثوابت: π² و -2/π</li>
+<li>مقاوم للهجمات الكمومية</li>
+</ul>
+<div class="pstats">
+<div class="sbox"><div class="v">1024</div><div class="l">بت أمان كمي</div></div>
+<div class="sbox"><div class="v">2n</div><div class="l">مفتاح مضاعف</div></div>
+</div>
+<button class="btn btn-p" onclick="selectProduct('PFE 3D v2.0')" style="width:100%;">اطلب عرضاً</button>
+</div>
+</div>
+</section>
+
+<section id="calculator">
+<h2 class="stitle">حاسبة الأمان</h2>
+<p class="ssub">اختر احتياجك وسنحدد النظام المناسب</p>
+<div class="calc">
+<div class="cstep">
+<h4><span class="snum">1</span> مجال التطبيق</h4>
+<div class="opts" id="step1">
+<div class="opt" data-value="personal" onclick="selectOption(this,1)"><div class="i">👤</div><div class="n">شخصي</div><div class="d">بريد، ملفات</div></div>
+<div class="opt" data-value="business" onclick="selectOption(this,1)"><div class="i">🏢</div><div class="n">مؤسسي</div><div class="d">شركات، بنوك</div></div>
+<div class="opt" data-value="government" onclick="selectOption(this,1)"><div class="i">🏛️</div><div class="n">حكومي</div><div class="d">اتصالات سيادية</div></div>
+<div class="opt" data-value="iot" onclick="selectOption(this,1)"><div class="i">📡</div><div class="n">IoT</div><div class="d">أجهزة محدودة</div></div>
+</div>
+</div>
+
+<div class="cstep">
+<h4><span class="snum">2</span> مستوى الأمان</h4>
+<div class="opts" id="step2">
+<div class="opt" data-value="standard" onclick="selectOption(this,2)"><div class="i">🔒</div><div class="n">قياسي</div><div class="d">512-1024</div></div>
+<div class="opt" data-value="high" onclick="selectOption(this,2)"><div class="i">🔐</div><div class="n">عالي</div><div class="d">2048</div></div>
+<div class="opt" data-value="military" onclick="selectOption(this,2)"><div class="i">🛡️</div><div class="n">عسكري</div><div class="d">4096</div></div>
+<div class="opt" data-value="quantum" onclick="selectOption(this,2)"><div class="i">⚛️</div><div class="n">مقاوم للكم</div><div class="d">8192+</div></div>
+</div>
+</div>
+
+<div class="cstep">
+<h4><span class="snum">3</span> حجم البيانات</h4>
+<div class="opts" id="step3">
+<div class="opt" data-value="small" onclick="selectOption(this,3)"><div class="i">📄</div><div class="n">صغير</div><div class="d">أقل من 1GB</div></div>
+<div class="opt" data-value="medium" onclick="selectOption(this,3)"><div class="i">📁</div><div class="n">متوسط</div><div class="d">1-100GB</div></div>
+<div class="opt" data-value="large" onclick="selectOption(this,3)"><div class="i">🗄️</div><div class="n">كبير</div><div class="d">100GB-1TB</div></div>
+<div class="opt" data-value="enterprise" onclick="selectOption(this,3)"><div class="i">🌐</div><div class="n">ضخم</div><div class="d">+1TB</div></div>
+</div>
+</div>
+
+<button class="btn btn-p" onclick="calculateSecurity()" style="width:100%;">🧮 احسب التوصية</button>
+
+<div class="cres" id="calcResult">
+<div class="rhdr">
+<h3>📋 توصيتنا</h3>
+<span class="pbadge bv2" id="resultProduct">PFE 3D v2.0</span>
+</div>
+<div class="rgrid">
+<div class="ritem"><div class="l">حجم المفتاح</div><div class="v" id="resultKeySize">2048 بت</div></div>
+<div class="ritem"><div class="l">زمن التوليد</div><div class="v" id="resultTime">20.5 ثانية</div></div>
+<div class="ritem"><div class="l">أمان كلاسيكي</div><div class="v" id="resultClassical">2^2036</div></div>
+<div class="ritem"><div class="l">أمان كمي</div><div class="v" id="resultQuantum">2^1018</div></div>
+<div class="ritem"><div class="l">التطبيق</div><div class="v" id="resultUseCase">مؤسسي</div></div>
+<div class="ritem"><div class="l">التكلفة</div><div class="v" id="resultCost">حسب الطلب</div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="contact">
+<h2 class="stitle">تواصل معنا</h2>
+<p class="ssub">اطلب عرضاً مخصصاً — سيتواصل معك المؤسس شخصياً</p>
+<div class="cform">
+<form action="https://formsubmit.co/mohamedbaraka545moon@gmail.com" method="POST">
+<input type="hidden" name="_subject" value="🐉 طلب جديد من موقع بركة والتنين">
+<input type="hidden" name="_captcha" value="false">
+<input type="hidden" name="_template" value="table">
+<div class="fgrid">
+<div class="fg"><label>الاسم الكامل *</label><input type="text" name="الاسم" required placeholder="أدخل اسمك"></div>
+<div class="fg"><label>البريد الإلكتروني *</label><input type="email" name="البريد" required placeholder="example@domain.com"></div>
+<div class="fg"><label>الجهة/المؤسسة</label><input type="text" name="الجهة" placeholder="اختياري"></div>
+<div class="fg"><label>رقم الهاتف</label><input type="tel" name="الهاتف" placeholder="+20 xxx xxx xxxx"></div>
+<div class="fg"><label>المنتج المطلوب *</label>
+<select name="المنتج" id="productSelect" required>
+<option value="">-- اختر --</option>
+<option value="PFE 1.0">PFE 1.0 — الأساس</option>
+<option value="PFE 3D v2.0">PFE 3D v2.0 — التوسع</option>
+<option value="both">كلا المنتجين</option>
+<option value="custom">حل مخصص</option>
+</select>
+</div>
+<div class="fg"><label>مستوى الأمان</label>
+<select name="مستوى_الأمان">
+<option value="standard">قياسي</option>
+<option value="high">عالي</option>
+<option value="military">عسكري</option>
+<option value="quantum">مقاوم للكم</option>
+</select>
+</div>
+<div class="fg full"><label>تفاصيل إضافية</label><textarea name="التفاصيل" placeholder="اشرح احتياجك..."></textarea></div>
+<div class="fg full"><button type="submit" class="btn btn-p" style="width:100%;">📩 إرسال إلى المؤسس</button></div>
+</div>
+</form>
+</div>
+</section>
+
+<footer>
+<div class="fcontent">
+<div class="fcol">
+<div class="fsym"><span>𓂀</span><span>🐉</span><span>🇪🇬</span><span>🇨🇳</span></div>
+<h4>🐉 بركة والتنين الصيني</h4>
+<p>نظام التشفير بالبصمة الأولية</p>
+<p style="color:#FFDE00;margin-top:15px;"><strong>المؤسس:</strong><br>أ. محمد عيد عبد العليم بركة<br>أستاذ الرياضيات — باحث مستقل</p>
+</div>
+<div class="fcol">
+<h4>روابط</h4>
+<a href="#story">القصة</a>
+<a href="#products">المنتجات</a>
+<a href="#calculator">الحاسبة</a>
+<a href="#contact">تواصل</a>
+</div>
+<div class="fcol">
+<h4>الشراكات</h4>
+<a href="#">أكاديمية البحث العلمي المصرية</a>
+<a href="#">الأكاديمية الصينية للعلوم</a>
+<a href="#">صندوق CERF المصري-الصيني</a>
+</div>
+<div class="fcol">
+<h4>تواصل</h4>
+<p>📧 mohamedbaraka545moon@gmail.com</p>
+<p>🌐 القاهرة — بكين</p>
+</div>
+</div>
+<div class="fbot">
+<p>© 2026 <strong style="color:#D4AF37;">بركة والتنين الصيني</strong> — جميع الحقوق محفوظة</p>
+<p style="color:#D4AF37;">صُنع بفخر في مصر 🇪🇬 بروح التنين الصيني 🐉</p>
+</div>
+</footer>
+
+<script>
+function selectProduct(n) {
+document.getElementById('productSelect').value = n;
+document.getElementById('contact').scrollIntoView({behavior:'smooth'});
+}
+
+const sel = {1:null, 2:null, 3:null};
+
+function selectOption(el, step) {
+el.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('sel'));
+el.classList.add('sel');
+sel[step] = el.dataset.value;
+}
+
+function calculateSecurity() {
+if (!sel[1] || !sel[2] || !sel[3]) {
+alert('⚠️ الرجاء الإجابة على جميع الأسئلة');
+return;
+}
+
+const recs = {
+personal: {
+standard: {p:'PFE 1.0', k:'512 بت', t:'0.12 ثانية', c:'2^506', q:'2^253', co:'مجاني'},
+high: {p:'PFE 1.0', k:'1024 بت', t:'1.89 ثانية', c:'2^1014', q:'2^507', co:'اقتصادي'},
+military: {p:'PFE 3D v2.0', k:'2048 بت', t:'20.5 ثانية', c:'2^2036', q:'2^1018', co:'متوسط'},
+quantum: {p:'PFE 3D v2.0', k:'4096 بت', t:'5.87 دقيقة', c:'2^4076', q:'2^2038', co:'مرتفع'}
+},
+business: {
+standard: {p:'PFE 1.0', k:'1024 بت', t:'1.89 ثانية', c:'2^1014', q:'2^507', co:'اقتصادي'},
+high: {p:'PFE 3D v2.0', k:'2048 بت', t:'20.5 ثانية', c:'2^2036', q:'2^1018', co:'متوسط'},
+military: {p:'PFE 3D v2.0', k:'4096 بت', t:'5.87 دقيقة', c:'2^4076', q:'2^2038', co:'مرتفع'},
+quantum: {p:'PFE 3D v2.0', k:'8192 بت', t:'85 دقيقة', c:'2^8156', q:'2^4078', co:'مؤسسي'}
+},
+government: {
+standard: {p:'PFE 3D v2.0', k:'2048 بت', t:'20.5 ثانية', c:'2^2036', q:'2^1018', co:'متوسط'},
+high: {p:'PFE 3D v2.0', k:'4096 بت', t:'5.87 دقيقة', c:'2^4076', q:'2^2038', co:'مرتفع'},
+military: {p:'PFE 3D v2.0', k:'8192 بت', t:'85 دقيقة', c:'2^8156', q:'2^4078', co:'سيادي'},
+quantum: {p:'PFE 3D v2.0', k:'16384 بت', t:'21 ساعة', c:'2^16316', q:'2^8158', co:'سيادي خاص'}
+},
+iot: {
+standard: {p:'PFE 1.0', k:'512 بت', t:'0.12 ثانية', c:'2^506', q:'2^253', co:'مجاني'},
+high: {p:'PFE 1.0', k:'1024 بت', t:'1.89 ثانية', c:'2^1014', q:'2^507', co:'اقتصادي'},
+military: {p:'PFE 3D v2.0', k:'2048 بت', t:'20.5 ثانية', c:'2^2036', q:'2^1018', co:'متوسط'},
+quantum: {p:'PFE 3D v2.0', k:'4096 بت', t:'5.87 دقيقة', c:'2^4076', q:'2^2038', co:'مرتفع'}
+}
+};
+
+const r = recs[sel[1]][sel[2]];
+document.getElementById('resultProduct').textContent = r.p;
+document.getElementById('resultKeySize').textContent = r.k;
+document.getElementById('resultTime').textContent = r.t;
+document.getElementById('resultClassical').textContent = r.c;
+document.getElementById('resultQuantum').textContent = r.q;
+document.getElementById('resultCost').textContent = r.co;
+
+const uc = {personal:'شخصي', business:'مؤسسي', government:'حكومي', iot:'IoT'};
+document.getElementById('resultUseCase').textContent = uc[sel[1]];
+
+const rd = document.getElementById('calcResult');
+rd.classList.add('vis');
+rd.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+a.addEventListener('click', e => {
+e.preventDefault();
+const t = document.querySelector(a.getAttribute('href'));
+if (t) t.scrollIntoView({behavior:'smooth'});
+});
+});
+</script>
+
+</body>
+</html>
