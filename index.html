@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>بركة والتنين الصيني — PFE 4.0</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:linear-gradient(135deg,#0A0A0A,#1A1A1A);color:#F5F5F5;line-height:1.7;padding:20px}
+.wrap{max-width:900px;margin:0 auto}
+.head{text-align:center;padding:30px 20px;border-bottom:3px solid #D4AF37;margin-bottom:30px;background:linear-gradient(90deg,rgba(0,51,102,.3),rgba(10,10,10,.3),rgba(222,41,16,.3));border-radius:15px}
+.head h1{font-size:2.5em;color:#D4AF37;margin-bottom:10px}
+.head p{color:#AAA}
+.head .badge{display:inline-block;padding:6px 20px;background:linear-gradient(90deg,#D4AF37,#DE2910);color:#fff;border-radius:20px;font-weight:700;margin-top:10px;font-size:.9em}
+.card{background:linear-gradient(135deg,rgba(26,26,26,.98),rgba(10,10,10,.98));border:2px solid #D4AF37;border-radius:20px;padding:30px;margin-bottom:25px;box-shadow:0 0 30px rgba(212,175,55,.15)}
+.card h2{color:#D4AF37;margin-bottom:20px;font-size:1.5em;border-bottom:1px solid rgba(212,175,55,.3);padding-bottom:10px}
+label{display:block;color:#D4AF37;margin-bottom:8px;font-weight:600}
+select{padding:12px 15px;background:rgba(0,0,0,.5);border:2px solid rgba(212,175,55,.3);border-radius:8px;color:#F5F5F5;font-size:1em;width:100%;font-family:inherit}
+select:focus{outline:none;border-color:#D4AF37}
+.drop{border:3px dashed rgba(212,175,55,.5);border-radius:15px;padding:40px;text-align:center;cursor:pointer;background:rgba(0,0,0,.3);transition:.3s}
+.drop:hover,.drop.over{border-color:#D4AF37;background:rgba(212,175,55,.1)}
+.drop .ic{font-size:4em;margin-bottom:15px}
+.drop .tx{color:#AAA;font-size:1.1em}
+.drop .fn{margin-top:15px;color:#D4AF37;font-weight:600;word-break:break-all}
+.bg{display:flex;gap:15px;margin-top:20px;flex-wrap:wrap}
+.btn{flex:1;padding:16px 30px;border:2px solid #D4AF37;background:linear-gradient(90deg,#D4AF37,#B8860B);color:#0A0A0A;font-size:1.1em;font-weight:700;cursor:pointer;transition:.3s;border-radius:10px;min-width:150px;font-family:inherit}
+.btn:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 10px 30px rgba(212,175,55,.5)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.dc{background:linear-gradient(90deg,#003366,#0055a5);color:#fff;border-color:#003366}
+.log{background:rgba(0,0,0,.6);border:1px solid rgba(212,175,55,.3);border-radius:10px;padding:15px;font-family:'Courier New',monospace;font-size:.85em;color:#AAA;max-height:220px;overflow-y:auto;margin-top:15px;direction:ltr;text-align:left}
+.log .ok{color:#00A86B}
+.log .er{color:#DE2910}
+.log .in{color:#FFDE00}
+.dl{display:none;margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(212,175,55,.1),rgba(222,41,16,.1));border:2px dashed #D4AF37;border-radius:15px;text-align:center}
+.dl.on{display:block}
+.dl a{display:inline-block;padding:15px 40px;background:linear-gradient(90deg,#D4AF37,#DE2910);color:#fff;text-decoration:none;border-radius:10px;font-weight:700;font-size:1.1em}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:15px;margin-top:15px}
+.stat{background:rgba(0,0,0,.4);padding:15px;border-radius:10px;border:1px solid rgba(212,175,55,.2);text-align:center}
+.stat .v{font-size:1.5em;color:#D4AF37;font-weight:bold}
+.stat .l{font-size:.85em;color:#AAA}
+.info{background:rgba(0,51,102,.2);border-right:4px solid #003366;padding:15px;border-radius:8px;margin-top:15px;font-size:.9em;color:#AAA}
+.info code{color:#FFDE00;font-family:monospace;direction:ltr;display:inline-block}
+.warn{background:rgba(222,41,16,.15);border-right:4px solid #DE2910;padding:15px;border-radius:8px;margin-top:15px;font-size:.95em}
+.warn strong{color:#FFDE00}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+th{background:linear-gradient(90deg,rgba(212,175,55,.15),rgba(222,41,16,.1));padding:14px;color:#D4AF37;text-align:right;border-bottom:2px solid rgba(212,175,55,.3)}
+td{padding:12px 14px;color:#AAA;border-bottom:1px solid rgba(212,175,55,.1)}
+td:first-child{color:#F5F5F5;font-weight:600}
+.pill{display:inline-block;padding:4px 12px;border-radius:14px;font-size:.85em;font-weight:700}
+.pill.ok{background:rgba(0,168,107,.15);color:#7ee0b5;border:1px solid rgba(0,168,107,.4)}
+.pill.th{background:rgba(212,175,55,.15);color:#FFDE00;border:1px solid rgba(212,175,55,.4)}
+.pill.des{background:rgba(0,102,204,.15);color:#7ab8ff;border:1px solid rgba(0,102,204,.4)}
+canvas{width:100%;max-width:100%;height:auto;background:rgba(0,0,0,.3);border-radius:10px;border:1px solid rgba(212,175,55,.2);margin-top:10px}
+.foot{text-align:center;padding:30px;color:#AAA;font-size:.9em;border-top:1px solid rgba(212,175,55,.2);margin-top:30px}
+.foot .logo{color:#D4AF37;font-weight:800;font-size:1.2em;margin-bottom:8px}
+@media(max-width:600px){.head h1{font-size:1.7em}.card{padding:20px}.bg{flex-direction:column}table{font-size:.85em}th,td{padding:10px 8px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="head">
+<div style="font-size:2.5em">𓂀 ⚔️ 🐉</div>
+<h1>بركة والتنين الصيني</h1>
+<p>التشفير الجبري السيادي — S-box من GF(2⁸)</p>
+<div class="badge">PFE 4.0 — Prime Fingerprint Encryption</div>
+</div>
+
+<div class="card">
+<h2>🔑 الخطوة 1: اختيار المفتاح</h2>
+<label for="prime">اختر عدداً أولياً:</label>
+<select id="prime">
+<option value="1021">1021</option>
+<option value="1031">1031</option>
+<option value="1049">1049</option>
+<option value="65537">65537 (بطيء قليلاً)</option>
+</select>
+<div id="keyInfo" class="log"><div class="in">جاري التحضير…</div></div>
+<div class="info"><code>S(x) = A · x⁻¹ + b</code> — حيث A مصفوفة 8×8 على GF(2)، و b ثابت 8-bit، مشتقان من W<sub>p</sub>.</div>
+</div>
+
+<div class="card">
+<h2>📁 الخطوة 2: اختيار الملف</h2>
+<div class="drop" id="drop">
+<div class="ic">📄</div>
+<div class="tx">اسحب الملف هنا، أو انقر للاختيار</div>
+<div class="fn" id="fname"></div>
+</div>
+<input type="file" id="file" style="display:none">
+</div>
+
+<div class="card">
+<h2>⚡ الخطوة 3: التشفير / فك التشفير</h2>
+<div class="bg">
+<button class="btn" id="enc" disabled>🔒 تشفير</button>
+<button class="btn dc" id="dec" disabled>🔓 فك التشفير</button>
+</div>
+<div class="log" id="log"><div class="in">جاهز. اختر ملفاً للبدء.</div></div>
+<div class="dl" id="dlArea">
+<div style="color:#AAA;margin-bottom:15px">✅ تمت العملية — <span id="outName" style="color:#D4AF37"></span></div>
+<a id="dlBtn" download>⬇️ تحميل الملف</a>
+<div class="stats" id="stats"></div>
+</div>
+<div class="warn"><strong>⚠️ تنبيه:</strong> تطبيق تجريبي تعليمي. راجع الأمان قبل استخدامه للإنتاج.</div>
+</div>
+
+<div class="card">
+<h2>📊 جدول حالة المشروع</h2>
+<table>
+<tr><th>المكوّن</th><th>الحالة</th><th>الوصف</th></tr>
+<tr><td>المعادلة الأم</td><td><span class="pill th">✅ مبرهنة</span></td><td>الأساس الرياضي الكامل</td></tr>
+<tr><td>البرهان الرياضي</td><td><span class="pill ok">✅ كامل</span></td><td>بالاستقراء ومبرهنة ويلسون</td></tr>
+<tr><td>PFE 1.0</td><td><span class="pill ok">✅ يعمل</span></td><td>الإصدار المصري</td></tr>
+<tr><td>PFE 3D v3.0</td><td><span class="pill des">✅ تصميم كامل</span></td><td>التوسع الثلاثي</td></tr>
+<tr><td>PFE 4.0 (GFNI)</td><td><span class="pill th">✅ تصميم نظري</span></td><td>S-box على GF(2⁸)</td></tr>
+<tr><td>الموقع الإلكتروني</td><td><span class="pill ok">✅ منشور</span></td><td>منصة تفاعلية</td></tr>
+<tr><td>الورقة العلمية</td><td><span class="pill ok">✅ جاهزة</span></td><td>قابلة للنشر</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>📈 التحليل البصري للدالة y(x)</h2>
+<p style="color:#AAA;margin-bottom:10px">الأعداد الأولية كقمم (y = 0)، المركبة كوديان (y &lt; 0)، وخط Γ(x) الأخضر.</p>
+<canvas id="chart" width="800" height="400"></canvas>
+<div style="display:flex;gap:20px;justify-content:center;margin-top:15px;flex-wrap:wrap;font-size:.9em;color:#AAA">
+<span>🟡 قمة أولية</span><span>🔴 وادي مركب</span><span>🟢 Γ(x)</span>
+</div>
+</div>
+
+<div class="card">
+<h2>📬 التواصل</h2>
+<p style="color:#AAA;margin-bottom:10px">للاستفسارات والعروض المخصصة:</p>
+<p style="color:#D4AF37;font-size:1.1em">📧 <strong>mohamed.baraka@example.com</strong></p>
+<p style="color:#AAA;margin-top:10px">🐙 github.com/mohamedbaraka545moon-cmd</p>
+</div>
+
+<div class="foot">
+<div class="logo">𓂀 ⚔️ 🐉 بركة والتنين الصيني</div>
+<p>تحالف الحضارتين لكسر احتكار التشفير الغربي</p>
+<p style="margin-top:10px">© 2025 جميع الحقوق محفوظة</p>
+</div>
+
+</div>
+
+<script>
+'use strict';
+
+/* ===== GF(2^8) ===== */
+function gfm(a,b){let p=0;for(let i=0;i<8;i++){if(b&1)p^=a;const h=a&0x80;a=(a<<1)&0xFF;if(h)a^=0x1B;b>>=1}return p}
+function bgi(){const inv=new Uint8Array(256);inv[0]=0;for(let x=1;x<256;x++){for(let y=1;y<256;y++){if(gfm(x,y)===1){inv[x]=y;break}}}return inv}
+const GI=bgi();
+function par8(x){x^=x>>4;x^=x>>2;x^=x>>1;return x&1}
+function pc8(x){x=x-((x>>1)&0x55);x=(x&0x33)+((x>>2)&0x33);return (x+(x>>4))&0x0F}
+
+/* ===== Matrix ===== */
+function invM(A){const m=new Uint8Array(A);for(let c=0;c<8;c++){let p=-1;for(let r=c;r<8;r++)if(m[r]&(1<<c)){p=r;break}if(p===-1)return false;if(p!==c){const t=m[c];m[c]=m[p];m[p]=t}for(let r=0;r<8;r++)if(r!==c&&(m[r]&(1<<c)))m[r]^=m[c]}return true}
+function genAB(prng){let A,b,at=0;do{A=new Uint8Array(8);for(let i=0;i<8;i++)A[i]=prng.ni(256);b=prng.ni(256);at++;if(at>5000)throw new Error('فشل توليد مصفوفة')}while(!invM(A));return{A,b}}
+function genS(A,b){const S=new Uint8Array(256);for(let x=0;x<256;x++){const xi=GI[x];let o=0;for(let i=0;i<8;i++)o|=(par8(A[i]&xi)<<i);S[x]=o^b}return S}
+
+/* ===== W_p ===== */
+async function wp(p,onF){const pB=BigInt(p),mod=pB*(1n<<256n),tot=pB-1n;let f=1n,l=performance.now();for(let i=1n;i<pB;i++){f=(f*i)%mod;if((i&1023n)===0n&&performance.now()-l>16){if(onF)onF(Number(i)/Number(tot||1n));await new Promise(r=>setTimeout(r,0));l=performance.now()}}const fp=(f+1n)%mod;if(fp%pB!==0n)throw new Error('فشل مبرهنة ويلسون');return fp/pB}
+function b2b(bi,len){const h=bi.toString(16).padStart(len*2,'0').slice(-len*2),o=new Uint8Array(len);for(let i=0;i<len;i++)o[i]=parseInt(h.slice(i*2,i*2+2),16);return o}
+function bitb(bi){let h=bi.toString(16);if(h.length%2)h='0'+h;const o=new Uint8Array(h.length/2);for(let i=0;i<o.length;i++)o[i]=parseInt(h.substr(i*2,2),16);return o}
+
+/* ===== Crypto ===== */
+async function sh(d){return new Uint8Array(await crypto.subtle.digest('SHA-256',d))}
+async function hm(k,d){const kk=await crypto.subtle.importKey('raw',k,{name:'HMAC',hash:'SHA-256'},false,['sign']);return new Uint8Array(await crypto.subtle.sign('HMAC',kk,d))}
+async function he(seed,purp,len){const inf=new TextEncoder().encode(purp),k=await crypto.subtle.importKey('raw',seed,{name:'HMAC',hash:'SHA-256'},false,['sign']);let out=new Uint8Array(0),T=new Uint8Array(0),c=1;while(out.length<len){const d=new Uint8Array(T.length+inf.length+1);d.set(T,0);d.set(inf,T.length);d[T.length+inf.length]=c;T=new Uint8Array(await crypto.subtle.sign('HMAC',k,d));const no=new Uint8Array(out.length+T.length);no.set(out,0);no.set(T,out.length);out=no;c++}return out.slice(0,len)}
+
+/* ===== PRNG ===== */
+class PRNG{constructor(s){this.s=0n;for(let i=0;i<Math.min(s.length,32);i++)this.s=(this.s<<8n)|BigInt(s[i]);if(this.s===0n)this.s=0x123456789abcdefn;this.m=(1n<<256n)-1n}
+n(){let s=this.s;s^=(s<<13n)&this.m;s^=s>>7n;s^=(s<<17n)&this.m;s&=this.m;this.s=s;return s}
+ni(m){return Number(this.n()%BigInt(m))}}
+function gp(prng,n){const P=new Uint8Array(n);for(let i=0;i<n;i++)P[i]=i;for(let i=n-1;i>0;i--){const j=prng.ni(i+1),t=P[i];P[i]=P[j];P[j]=t}return P}
+
+/* ===== Keys ===== */
+const kc=new Map();
+function dak(p,onP){let e=kc.get(p);if(!e){const ls=new Set();const em=(m)=>ls.forEach(f=>{try{f(m)}catch(_){}});const pm=daku(p,em).catch(err=>{kc.delete(p);throw err});e={pm,ls};kc.set(p,e)}if(onP){e.ls.add(onP);e.pm.then(()=>e.ls.delete(onP),()=>e.ls.delete(onP))}return e.pm}
+async function daku(p,onP){
+const rep=m=>{if(onP)onP(m)};
+rep('حساب W_p (مبرهنة ويلسون)…');
+const Wp=await wp(p,fr=>rep(`حساب W_p… ${(fr*100).toFixed(0)}%`));
+const Wb=b2b(Wp,32);
+rep('اشتقاق البذور…');
+const sd=await sh(Wb);
+const aS=await he(sd,'affine_pfe4',64),pS=await he(sd,'perm_pfe4',64),kzS=await he(sd,'kz_pfe4',16),kyS=await he(sd,'ky_pfe4',16),mk=await he(sd,'mac_pfe4',32);
+rep('توليد S-box الجبري…');
+const {A,b}=genAB(new PRNG(aS)),S=genS(A,b);
+const ck=new Uint8Array(256);for(let i=0;i<256;i++)ck[S[i]]=1;
+for(let i=0;i<256;i++)if(ck[i]!==1)throw new Error('S-box ليس تبديلاً');
+const Si=new Uint8Array(256);for(let i=0;i<256;i++)Si[S[i]]=i;
+rep('توليد التبديل والمفاتيح…');
+const BS=16,P=gp(new PRNG(pS),BS),Pi=new Uint8Array(BS);
+for(let i=0;i<BS;i++)Pi[P[i]]=i;
+const Kz=new Uint8Array(kzS);for(let i=0;i<BS;i++)if(Kz[i]===0)Kz[i]=1;
+const Ky=new Uint8Array(kyS);
+let ss=0;for(let i=0;i<256;i++)ss^=S[i];
+rep('تم.');
+return{S,Si,P,Pi,Kz,Ky,macKey:mk,Wp,p,BS,A,b,sboxSum:ss}}
+
+/* ===== Blocks ===== */
+function eblk(b,k){const{S,P,Kz,Ky,BS}=k,L1=new Uint8Array(BS),L2=new Uint8Array(BS),L3=new Uint8Array(BS),o=new Uint8Array(BS);for(let i=0;i<BS;i++)L1[i]=S[b[i]];for(let i=0;i<BS;i++)L2[i]=L1[P[i]];for(let i=0;i<BS;i++)L3[i]=(L2[i]+Kz[i])&0xFF;for(let i=0;i<BS;i++)o[i]=L3[i]^Ky[i];return o}
+function dblk(b,k){const{Si,P,Kz,Ky,BS}=k,L3=new Uint8Array(BS),L2=new Uint8Array(BS),L1=new Uint8Array(BS),o=new Uint8Array(BS);for(let i=0;i<BS;i++)L3[i]=b[i]^Ky[i];for(let i=0;i<BS;i++)L2[i]=(L3[i]-Kz[i])&0xFF;for(let i=0;i<BS;i++)L1[P[i]]=L2[i];for(let i=0;i<BS;i++)o[i]=Si[L1[i]];return o}
+
+/* ===== Container ===== */
+const MG=[0x50,0x46,0x45,0x34],FV=1,ML=32;
+function eh(p){const pb=bitb(BigInt(p)),o=new Uint8Array(6+pb.length);o.set(MG,0);o[4]=FV;o[5]=pb.length;o.set(pb,6);return o}
+function ic(buf){if(buf.length>=6&&buf[0]===MG[0]&&buf[1]===MG[1]&&buf[2]===MG[2]&&buf[3]===MG[3]){const v=buf[4];if(v!==FV)throw new Error('إصدار غير مدعوم');const pl=buf[5];if(pl<1||pl>8)throw new Error('حقل أولي غير صالح');if(buf.length<6+pl)throw new Error('ملف مبتور');let bi=0n;for(let i=0;i<pl;i++)bi=(bi<<8n)|BigInt(buf[6+i]);if(bi>BigInt(Number.MAX_SAFE_INTEGER))throw new Error('عدد كبير');return{prime:Number(bi),headerLen:6+pl,legacy:false}}return{prime:null,headerLen:0,legacy:true}}
+
+async function ecf(data,keys,prime){
+const BS=keys.BS,h=eh(prime);
+const pad=BS-(data.length%BS),padd=new Uint8Array(data.length+pad);
+padd.set(data,0);padd.fill(pad,data.length);
+const iv=new Uint8Array(BS);crypto.getRandomValues(iv);
+const nb=padd.length/BS,cf=new Uint8Array(padd.length);
+let pv=iv;
+for(let b=0;b<nb;b++){const bl=new Uint8Array(BS);for(let i=0;i<BS;i++)bl[i]=padd[b*BS+i]^pv[i];const e=eblk(bl,keys);cf.set(e,b*BS);pv=e}
+const bd=new Uint8Array(h.length+BS+cf.length);
+bd.set(h,0);bd.set(iv,h.length);bd.set(cf,h.length+BS);
+const mac=await hm(keys.macKey,bd);
+const o=new Uint8Array(bd.length+ML);
+o.set(bd,0);o.set(mac,bd.length);return o}
+
+async function dcf(buf,keys,hLen){
+const BS=keys.BS;
+if(buf.length<hLen+BS+ML)throw new Error('ملف قصير');
+const bd=buf.slice(0,buf.length-ML),mac=buf.slice(buf.length-ML);
+const em=await hm(keys.macKey,bd);
+let df=0;for(let i=0;i<ML;i++)df|=mac[i]^em[i];
+if(df!==0)throw new Error('HMAC فشل — الملف معدّل أو المفتاح خاطئ');
+const iv=bd.slice(hLen,hLen+BS),cf=bd.slice(hLen+BS);
+if(cf.length===0||cf.length%BS!==0)throw new Error('بنية غير صالحة');
+const nb=cf.length/BS,pl=new Uint8Array(cf.length);
+let pv=iv;
+for(let b=0;b<nb;b++){const bl=cf.slice(b*BS,(b+1)*BS),d=dblk(bl,keys);for(let i=0;i<BS;i++)pl[b*BS+i]=d[i]^pv[i];pv=bl}
+const pl2=pl[pl.length-1];
+if(pl2<1||pl2>BS)throw new Error('Padding غير صحيح');
+for(let i=pl.length-pl2;i<pl.length;i++)if(pl[i]!==pl2)throw new Error('Padding غير صحيح');
+return pl.slice(0,pl.length-pl2)}
+
+/* ===== Diagnostics ===== */
+function sav(S){let t=0;for(let x=0;x<256;x++)for(let b=0;b<8;b++)t+=pc8(S[x]^S[x^(1<<b)]);return t/(256*8)}
+function sdu(S){let mx=0;const cn=new Uint16Array(256);for(let a=1;a<256;a++){cn.fill(0);for(let x=0;x<256;x++)cn[S[x]^S[x^a]]++;for(let i=0;i<256;i++)if(cn[i]>mx)mx=cn[i]}return mx}
+
+/* ===== UI ===== */
+const $=id=>document.getElementById(id);
+const logEl=$('log'),dlArea=$('dlArea'),dlBtn=$('dlBtn'),outName=$('outName'),stats=$('stats'),primeSel=$('prime'),fileIn=$('file'),drop=$('drop'),fname=$('fname'),encBtn=$('enc'),decBtn=$('dec'),keyInfo=$('keyInfo');
+let sf=null,sfb=null,lou=null,busy=false;
+
+function alog(m,t='in'){const d=document.createElement('div');d.className=t;d.textContent=`[${new Date().toLocaleTimeString('en-GB')}] ${m}`;logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight}
+function sbusy(s){busy=s;encBtn.disabled=s||!sfb;decBtn.disabled=s||!sfb}
+function sdl(bl,n){if(lou)URL.revokeObjectURL(lou);lou=URL.createObjectURL(bl);dlBtn.href=lou;dlBtn.download=n;outName.textContent=n;dlArea.classList.add('on')}
+function kb(b){return (b/1024).toFixed(1)}
+
+async function preloadKeys(){
+const p=parseInt(primeSel.value,10);
+keyInfo.innerHTML='<div class="in">جاري الاشتقاق…</div>';
+try{const t0=performance.now();
+const k=await dak(p,m=>{keyInfo.innerHTML=`<div class="in">${m}</div>`});
+const dt=(performance.now()-t0)/1000;
+const Ah=Array.from(k.A).map(x=>x.toString(16).padStart(2,'0')).join(' ');
+const bh=k.b.toString(16).padStart(2,'0');
+keyInfo.innerHTML=`<div class="ok">✅ تم تجهيز PFE 4.0 لـ p = ${p} (${dt.toFixed(2)} ث)</div>
+<div style="margin-top:8px;font-size:.85em">
+<div>W_p = ${k.Wp.toString(16).slice(0,32)}…</div>
+<div style="margin-top:5px">A = ${Ah}</div>
+<div>b = 0x${bh}</div>
+<div>SAC = ${sav(k.S).toFixed(3)} / 8</div>
+<div>DU = ${sdu(k.S)}</div>
+<div>XOR-sum = 0x${k.sboxSum.toString(16).padStart(2,'0')}</div>
+</div>`}
+catch(e){keyInfo.innerHTML=`<div class="er">❌ خطأ: ${e.message}</div>`}}
+
+primeSel.addEventListener('change',preloadKeys);
+drop.addEventListener('click',()=>fileIn.click());
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('over')});
+drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
+drop.addEventListener('drop',async e=>{e.preventDefault();drop.classList.remove('over');if(e.dataTransfer.files.length>0)await hf(e.dataTransfer.files[0])});
+fileIn.addEventListener('change',async e=>{if(e.target.files.length>0)await hf(e.target.files[0]);fileIn.value=''});
+
+async function hf(f){
+if(busy)return;
+sf=f;fname.textContent=`${f.name} (${(f.size/1024).toFixed(2)} KB)`;
+sfb=new Uint8Array(await f.arrayBuffer());
+encBtn.disabled=false;decBtn.disabled=false;dlArea.classList.remove('on');
+alog(`تم تحميل: ${f.name} (${f.size} بايت)`,'ok');
+try{const inf=ic(sfb);if(!inf.legacy){alog(`🔎 ملف PFE4 — العدد الأولي: ${inf.prime}`,'in');epo(inf.prime)}}catch(e){alog(`⚠️ ${e.message}`,'er')}}
+
+function epo(p){const v=String(p);for(const o of primeSel.options)if(o.value===v)return;const o=document.createElement('option');o.value=v;o.textContent=`${v} (من الملف)`;primeSel.appendChild(o)}
+
+encBtn.addEventListener('click',async()=>{
+if(!sfb||busy)return;
+sbusy(true);dlArea.classList.remove('on');
+try{const p=parseInt(primeSel.value,10),t0=performance.now();
+alog(`بدء التشفير (p = ${p})…`,'in');
+const k=await dak(p,m=>alog(m,'in'));
+const enc=await ecf(sfb,k,p);
+const dt=(performance.now()-t0)/1000;
+const mb=sfb.length/1048576,speed=dt>0?mb/dt:0;
+const ofn=sf.name+'.pfe4';
+sdl(new Blob([enc],{type:'application/octet-stream'}),ofn);
+stats.innerHTML=`<div class="stat"><div class="v">${kb(sfb.length)}</div><div class="l">حجم أصلي (KB)</div></div>
+<div class="stat"><div class="v">${kb(enc.length)}</div><div class="l">حجم مشفر (KB)</div></div>
+<div class="stat"><div class="v">${dt.toFixed(3)}</div><div class="l">الزمن (ث)</div></div>
+<div class="stat"><div class="v">${speed.toFixed(2)}</div><div class="l">MB/s</div></div>`;
+alog(`✅ تم التشفير في ${dt.toFixed(3)} ث → ${ofn}`,'ok')}
+catch(e){alog(`❌ فشل: ${e.message}`,'er')}
+finally{sbusy(false)}});
+
+decBtn.addEventListener('click',async()=>{
+if(!sfb||busy)return;
+sbusy(true);dlArea.classList.remove('on');
+try{const t0=performance.now();
+let prime,hLen;
+const inf=ic(sfb);
+if(inf.legacy){prime=parseInt(primeSel.value,10);hLen=0;alog(`⚠️ ملف بلا ترويسة — p = ${prime}`,'in')}
+else{prime=inf.prime;hLen=inf.headerLen;epo(prime);primeSel.value=String(prime);alog(`🔎 ترويسة صالحة — p = ${prime}`,'ok')}
+alog('اشتقاق المفاتيح…','in');
+const k=await dak(prime,m=>alog(m,'in'));
+const dec=await dcf(sfb,k,hLen);
+const dt=(performance.now()-t0)/1000;
+const mb=sfb.length/1048576,speed=dt>0?mb/dt:0;
+const ofn=sf.name.replace(/\.pfe4$/i,'')||'decrypted.bin';
+sdl(new Blob([dec],{type:'application/octet-stream'}),ofn);
+stats.innerHTML=`<div class="stat"><div class="v">${kb(sfb.length)}</div><div class="l">حجم مشفر (KB)</div></div>
+<div class="stat"><div class="v">${kb(dec.length)}</div><div class="l">حجم أصلي (KB)</div></div>
+<div class="stat"><div class="v">${dt.toFixed(3)}</div><div class="l">الزمن (ث)</div></div>
+<div class="stat"><div class="v">${speed.toFixed(2)}</div><div class="l">MB/s</div></div>`;
+alog(`✅ تم فك التشفير في ${dt.toFixed(3)} ث → ${ofn}`,'ok')}
+catch(e){alog(`❌ فشل: ${e.message}`,'er')}
+finally{sbusy(false)}});
+
+/* ===== Chart ===== */
+(function draw(){
+const ch=$('chart'),cx=ch.getContext('2d');
+function ip(n){if(n<2)return false;if(n===2)return true;if(n%2===0)return false;for(let i=3;i<=Math.sqrt(n);i+=2)if(n%i===0)return false;return true}
+function gm(z){if(z<.5)return Math.PI/(Math.sin(Math.PI*z)*gm(1-z));z-=1;const g=7,C=[.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];let x=C[0];for(let i=1;i<g+2;i++)x+=C[i]/(z+i);const t=z+g+.5;return Math.sqrt(2*Math.PI)*Math.pow(t,z+.5)*Math.exp(-t)*x}
+const W=ch.width,H=ch.height,pd={t:30,r:30,b:40,l:50},pW=W-pd.l-pd.r,pH=H-pd.t-pd.b;
+cx.fillStyle='rgba(0,0,0,.2)';cx.fillRect(0,0,W,H);
+const xm=2,xM=60,n=xM-xm;
+function yf(x){if(ip(x))return 0;let d=0;for(let i=1;i<=x;i++)if(x%i===0)d++;return -(d/4)}
+cx.strokeStyle='rgba(212,175,55,.3)';cx.lineWidth=1;
+const zy=pd.t+pH*.55;
+cx.beginPath();cx.moveTo(pd.l,zy);cx.lineTo(W-pd.r,zy);cx.stroke();
+cx.beginPath();cx.moveTo(pd.l,pd.t);cx.lineTo(pd.l,H-pd.b);cx.stroke();
+cx.strokeStyle='rgba(255,255,255,.04)';
+for(let i=0;i<=5;i++){const y=pd.t+(pH/5)*i;cx.beginPath();cx.moveTo(pd.l,y);cx.lineTo(W-pd.r,y);cx.stroke()}
+cx.beginPath();
+for(let i=0;i<=n;i++){const x=xm+i,px=pd.l+(i/n)*pW,py=zy-yf(x)*(pH/8);if(i===0)cx.moveTo(px,py);else cx.lineTo(px,py)}
+cx.strokeStyle='#D4AF37';cx.lineWidth=2.5;cx.stroke();
+for(let x=xm;x<=xM;x++){if(ip(x)){const px=pd.l+((x-xm)/n)*pW;cx.beginPath();cx.arc(px,zy,4,0,Math.PI*2);cx.fillStyle='#FFDE00';cx.fill();cx.strokeStyle='#D4AF37';cx.lineWidth=1.5;cx.stroke()}}
+for(let x=xm;x<=xM;x++){if(!ip(x)&&x>1){const px=pd.l+((x-xm)/n)*pW,py=zy-yf(x)*(pH/8);cx.beginPath();cx.arc(px,py,3,0,Math.PI*2);cx.fillStyle='rgba(222,41,16,.7)';cx.fill()}}
+cx.beginPath();
+for(let i=0;i<=n;i++){const x=xm+i;if(x<=1)continue;const gx=Math.min(gm(x),1e6),nm=Math.log10(1+gx)/6,px=pd.l+(i/n)*pW,py=pd.t+pH-nm*pH*.8;if(i===0||x===xm)cx.moveTo(px,py);else cx.lineTo(px,py)}
+cx.strokeStyle='rgba(0,168,107,.6)';cx.lineWidth=1.8;cx.stroke();
+cx.fillStyle='rgba(170,170,170,.8)';cx.font='12px Segoe UI';cx.textAlign='center';
+for(let x=10;x<=60;x+=10){const px=pd.l+((x-xm)/n)*pW;cx.fillText(x.toString(),px,H-pd.b+20)}
+cx.save();cx.translate(15,H/2);cx.rotate(-Math.PI/2);cx.fillText('y(x)',0,0);cx.restore();
+})();
+
+preloadKeys();
+console.log('%c𓂀 ⚔️ 🐉 بركة والتنين الصيني','font-size:20px;color:#D4AF37;font-weight:bold');
+</script>
+</body>
+</html>
