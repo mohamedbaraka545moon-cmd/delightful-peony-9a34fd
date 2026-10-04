@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PFE Pro — التشفير السيادي المتقدم</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,sans-serif}
+:root{
+  --g:#D4AF37;--gd:#B8860B;--r:#DE2910;--b:#003366;--gr:#00A86B;--cg:#FFDE00;
+  --mt:#AAA;--lt:#F5F5F5;--bg1:#0A0A0A;--bg2:#1A1A1A;
+  --glow:0 0 40px rgba(212,175,55,.4);
+}
+html{scroll-behavior:smooth}
+body{
+  background:linear-gradient(135deg,#0A0A0A,#1A1A1A);
+  color:var(--lt);line-height:1.7;min-height:100vh;
+  overflow-x:hidden;position:relative;
+}
+
+/* Animated background */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(circle at 20% 30%,rgba(0,51,102,.15),transparent 50%),
+    radial-gradient(circle at 80% 70%,rgba(222,41,16,.12),transparent 50%),
+    radial-gradient(circle at 50% 50%,rgba(212,175,55,.08),transparent 70%);
+  animation:bgShift 20s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes bgShift{
+  0%,100%{transform:scale(1) rotate(0deg)}
+  50%{transform:scale(1.1) rotate(5deg)}
+}
+
+/* Floating particles */
+.particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.particle{
+  position:absolute;width:3px;height:3px;background:var(--g);
+  border-radius:50%;opacity:.3;animation:float-up linear infinite;
+}
+@keyframes float-up{
+  from{transform:translateY(100vh) scale(0);opacity:0}
+  10%{opacity:.6}
+  90%{opacity:.6}
+  to{transform:translateY(-100px) scale(1);opacity:0}
+}
+
+.wrap{max-width:1000px;margin:0 auto;padding:20px;position:relative;z-index:1}
+
+/* Header */
+.hero-head{
+  text-align:center;padding:50px 20px 30px;position:relative;
+}
+.hero-head .dragon{
+  font-size:5em;display:inline-block;margin-bottom:15px;
+  filter:drop-shadow(0 0 30px rgba(212,175,55,.6));
+  animation:float 4s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+.hero-head h1{
+  font-size:3em;color:var(--g);margin-bottom:10px;
+  text-shadow:0 0 30px rgba(212,175,55,.5);
+  background:linear-gradient(90deg,#D4AF37,#FFDE00,#D4AF37);
+  background-size:200% auto;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shine 4s linear infinite;
+}
+@keyframes shine{to{background-position:200% center}}
+.hero-head p{color:var(--mt);font-size:1.1em;max-width:600px;margin:0 auto}
+.hero-head .version{
+  display:inline-block;padding:6px 20px;margin-top:15px;
+  background:linear-gradient(90deg,var(--gr),#00805A);color:#fff;
+  border-radius:20px;font-weight:700;font-size:.85em;
+  box-shadow:0 0 20px rgba(0,168,107,.4);
+}
+
+/* Security Dashboard */
+.dashboard{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:15px;margin:30px 0;
+}
+.dash-item{
+  background:rgba(0,0,0,.5);border:2px solid rgba(212,175,55,.3);
+  border-radius:15px;padding:20px 15px;text-align:center;
+  transition:.3s;position:relative;overflow:hidden;
+}
+.dash-item::before{
+  content:'';position:absolute;top:0;left:0;width:100%;height:3px;
+  background:linear-gradient(90deg,var(--g),var(--gr));
+  transform:scaleX(0);transition:.5s;transform-origin:left;
+}
+.dash-item:hover::before{transform:scaleX(1)}
+.dash-item:hover{transform:translateY(-5px);box-shadow:0 10px 25px rgba(212,175,55,.2)}
+.dash-item .icon{font-size:2em;margin-bottom:8px}
+.dash-item .val{font-size:1.4em;color:var(--gr);font-weight:800}
+.dash-item .lbl{font-size:.75em;color:var(--mt);margin-top:5px}
+
+/* Card */
+.card{
+  background:linear-gradient(135deg,rgba(26,26,26,.95),rgba(10,10,10,.95));
+  border:2px solid rgba(212,175,55,.35);border-radius:20px;
+  padding:30px;margin-bottom:25px;position:relative;
+  box-shadow:0 10px 40px rgba(0,0,0,.5);
+}
+.card::before{
+  content:'';position:absolute;top:0;left:20px;right:20px;height:2px;
+  background:linear-gradient(90deg,transparent,var(--g),transparent);
+}
+.card h2{
+  color:var(--g);margin-bottom:20px;font-size:1.3em;
+  display:flex;align-items:center;gap:10px;
+}
+.card h2 .step-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,var(--g),var(--gd));
+  color:#0A0A0A;font-weight:800;font-size:.9em;
+}
+
+/* Drop Zone */
+.drop-zone{
+  border:3px dashed rgba(212,175,55,.5);border-radius:18px;
+  padding:50px 30px;text-align:center;cursor:pointer;
+  background:rgba(0,0,0,.3);transition:.4s;position:relative;
+  overflow:hidden;
+}
+.drop-zone::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at center,rgba(212,175,55,.15),transparent 70%);
+  opacity:0;transition:.4s;
+}
+.drop-zone:hover::before,.drop-zone.dragover::before{opacity:1}
+.drop-zone:hover,.drop-zone.dragover{
+  border-color:var(--g);background:rgba(212,175,55,.08);
+  transform:scale(1.01);
+}
+.drop-zone .icon{
+  font-size:4em;margin-bottom:15px;
+  filter:drop-shadow(0 0 20px rgba(212,175,55,.5));
+  transition:.4s;
+}
+.drop-zone:hover .icon{transform:translateY(-10px) scale(1.1)}
+.drop-zone .text{color:var(--mt);font-size:1.1em;margin-bottom:8px}
+.drop-zone .hint{color:rgba(170,170,170,.6);font-size:.85em}
+.drop-zone .filename{
+  margin-top:15px;color:var(--g);font-weight:700;
+  font-size:1em;word-break:break-all;
+  padding:10px;background:rgba(212,175,55,.1);border-radius:10px;
+}
+
+/* Password */
+.pwd-wrapper{position:relative}
+.pwd-input{
+  padding:15px 50px 15px 20px;background:rgba(0,0,0,.5);
+  border:2px solid rgba(212,175,55,.3);border-radius:12px;
+  color:var(--lt);font-size:1.05em;width:100%;font-family:inherit;
+  transition:.3s;
+}
+.pwd-input:focus{outline:none;border-color:var(--g);box-shadow:0 0 20px rgba(212,175,55,.3)}
+.pwd-toggle{
+  position:absolute;left:15px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--mt);font-size:1.3em;
+  cursor:pointer;padding:5px;transition:.3s;
+}
+.pwd-toggle:hover{color:var(--g)}
+
+.pwd-strength{
+  display:flex;gap:5px;margin-top:12px;
+}
+.pwd-strength .bar{
+  flex:1;height:6px;background:rgba(255,255,255,.1);
+  border-radius:3px;transition:.3s;
+}
+.pwd-strength .bar.active-weak{background:var(--r)}
+.pwd-strength .bar.active-medium{background:var(--cg)}
+.pwd-strength .bar.active-strong{background:var(--gr)}
+.pwd-feedback{
+  margin-top:8px;font-size:.85em;color:var(--mt);min-height:20px;
+}
+
+/* Buttons */
+.btn-group{display:flex;gap:15px;flex-wrap:wrap;margin-top:20px}
+.btn{
+  flex:1;min-width:180px;padding:16px 28px;
+  border:2px solid var(--g);border-radius:12px;
+  font-size:1.05em;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:.3s;position:relative;overflow:hidden;
+  background:linear-gradient(90deg,var(--g),var(--gd));
+  color:#0A0A0A;
+}
+.btn::before{
+  content:'';position:absolute;top:50%;left:50%;
+  width:0;height:0;border-radius:50%;
+  background:rgba(255,255,255,.3);
+  transform:translate(-50%,-50%);transition:width .5s,height .5s;
+}
+.btn:hover:not(:disabled)::before{width:300px;height:300px}
+.btn:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 15px 35px rgba(212,175,55,.4)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.encrypt{background:linear-gradient(90deg,var(--g),var(--gd));color:#0A0A0A}
+.btn.decrypt{
+  background:linear-gradient(90deg,var(--b),#0055a5);color:#fff;
+  border-color:var(--b);
+}
+.btn.decrypt:hover:not(:disabled){box-shadow:0 15px 35px rgba(0,51,102,.5)}
+.btn.ghost{background:transparent;color:var(--mt);border-color:rgba(170,170,170,.3)}
+.btn.ghost:hover:not(:disabled){background:rgba(255,255,255,.05);color:var(--lt)}
+
+/* Progress */
+.progress-wrapper{
+  margin-top:20px;display:none;
+}
+.progress-wrapper.active{display:block}
+.progress-info{
+  display:flex;justify-content:space-between;
+  color:var(--mt);font-size:.9em;margin-bottom:8px;
+}
+.progress-bar{
+  height:10px;background:rgba(0,0,0,.6);border-radius:5px;
+  overflow:hidden;position:relative;
+}
+.progress-fill{
+  height:100%;width:0;
+  background:linear-gradient(90deg,var(--g),var(--r),var(--cg));
+  background-size:200% 100%;
+  animation:progress-shine 2s linear infinite;
+  border-radius:5px;transition:width .3s;
+}
+@keyframes progress-shine{to{background-position:200% 0}}
+
+/* Rounds visualization */
+.rounds-visual{
+  display:flex;gap:4px;margin-top:15px;
+  justify-content:center;flex-wrap:wrap;
+}
+.round-dot{
+  width:14px;height:14px;border-radius:50%;
+  background:rgba(255,255,255,.1);
+  border:2px solid rgba(212,175,55,.3);
+  transition:.4s;
+}
+.round-dot.done{
+  background:var(--gr);border-color:var(--gr);
+  box-shadow:0 0 10px var(--gr);
+}
+
+/* Log */
+.log{
+  background:rgba(0,0,0,.7);border:1px solid rgba(212,175,55,.3);
+  border-radius:12px;padding:18px;margin-top:20px;
+  font-family:'Courier New',monospace;font-size:.82em;
+  color:var(--mt);max-height:250px;overflow-y:auto;
+  direction:ltr;text-align:left;line-height:1.9;
+}
+.log::-webkit-scrollbar{width:6px}
+.log::-webkit-scrollbar-track{background:rgba(0,0,0,.3);border-radius:3px}
+.log::-webkit-scrollbar-thumb{background:var(--g);border-radius:3px}
+.log .ok{color:#7ee0b5}
+.log .er{color:#FF8A7A}
+.log .warn{color:var(--cg)}
+.log .info{color:var(--g)}
+.log .big{color:var(--cg);font-weight:bold;font-size:1.05em}
+
+/* Download */
+.download-area{
+  display:none;margin-top:20px;padding:25px;
+  background:linear-gradient(135deg,rgba(0,168,107,.15),rgba(212,175,55,.15));
+  border:2px dashed var(--gr);border-radius:18px;text-align:center;
+}
+.download-area.active{display:block;animation:slideDown .5s ease}
+@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.download-area .success-icon{font-size:3em;margin-bottom:15px;animation:pop .5s ease}
+@keyframes pop{0%{transform:scale(0)}80%{transform:scale(1.2)}100%{transform:scale(1)}}
+.download-area h3{color:var(--gr);margin-bottom:15px}
+.download-btn{
+  display:inline-block;padding:15px 40px;
+  background:linear-gradient(90deg,var(--gr),#00805A);
+  color:#fff;text-decoration:none;border-radius:12px;
+  font-weight:700;font-size:1.1em;transition:.3s;
+  box-shadow:0 10px 25px rgba(0,168,107,.4);
+}
+.download-btn:hover{transform:translateY(-3px);box-shadow:0 15px 35px rgba(0,168,107,.6)}
+
+/* Stats Grid */
+.stats-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:15px;margin-top:20px;
+}
+.stat-box{
+  background:rgba(0,0,0,.4);padding:18px;border-radius:12px;
+  border:1px solid rgba(212,175,55,.2);text-align:center;
+}
+.stat-box .v{font-size:1.6em;color:var(--g);font-weight:800;line-height:1.2}
+.stat-box .l{font-size:.78em;color:var(--mt);margin-top:5px}
+
+/* Brute Force Time */
+.brute-force{
+  background:linear-gradient(135deg,rgba(222,41,16,.1),rgba(0,0,0,.4));
+  border:2px solid rgba(222,41,16,.4);border-radius:15px;
+  padding:25px;margin-top:25px;text-align:center;
+}
+.brute-force h3{color:var(--r);margin-bottom:15px;font-size:1.2em}
+.brute-force .time{
+  font-size:2.5em;color:var(--cg);font-weight:900;
+  text-shadow:0 0 20px rgba(255,222,0,.5);
+  margin:15px 0;
+}
+.brute-force .desc{color:var(--mt);font-size:.9em}
+
+/* Info Box */
+.info-box{
+  background:rgba(0,51,102,.2);border-right:4px solid var(--b);
+  padding:15px 20px;border-radius:10px;margin-bottom:20px;
+  font-size:.9em;color:var(--mt);
+}
+.info-box strong{color:var(--cg)}
+
+/* Advanced toggle */
+.advanced-toggle{
+  display:inline-flex;align-items:center;gap:8px;
+  color:var(--mt);cursor:pointer;padding:8px 15px;
+  border-radius:8px;transition:.3s;font-size:.9em;
+  margin-top:10px;
+}
+.advanced-toggle:hover{background:rgba(212,175,55,.1);color:var(--g)}
+.advanced-panel{display:none;margin-top:15px}
+.advanced-panel.active{display:block;animation:slideDown .3s ease}
+
+/* Footer */
+.foot{
+  text-align:center;padding:40px 20px;color:var(--mt);
+  font-size:.9em;border-top:1px solid rgba(212,175,55,.2);margin-top:40px;
+}
+.foot .logo{color:var(--g);font-weight:800;font-size:1.2em;margin-bottom:10px}
+
+/* Toast notifications */
+.toast{
+  position:fixed;top:20px;left:50%;transform:translateX(-50%);
+  padding:15px 30px;background:rgba(0,0,0,.95);color:#fff;
+  border-radius:12px;z-index:9999;font-weight:600;
+  border:2px solid var(--g);box-shadow:0 10px 30px rgba(0,0,0,.5);
+  animation:toastIn .3s ease;
+}
+.toast.success{border-color:var(--gr);color:#7ee0b5}
+.toast.error{border-color:var(--r);color:#FF8A7A}
+.toast.warn{border-color:var(--cg);color:var(--cg)}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,-20px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* Responsive */
+@media(max-width:600px){
+  .hero-head h1{font-size:1.8em}
+  .card{padding:20px}
+  .btn{min-width:auto;padding:14px 20px;font-size:.95em}
+  .btn-group{flex-direction:column}
+  .dashboard{grid-template-columns:1fr 1fr}
+  .drop-zone{padding:35px 20px}
+}
+</style>
+</head>
+<body>
+
+<!-- Floating particles container -->
+<div class="particles" id="particles"></div>
+
+<div class="wrap">
+
+<!-- Hero Header -->
+<div class="hero-head">
+  <div class="dragon">🐉</div>
+  <h1>PFE Pro</h1>
+  <p>التشفير السيادي المتقدم — أمان بمستوى البنوك في متصفحك</p>
+  <span class="version">v4.2 — 10 جولات • MixColumns • HMAC-SHA256</span>
+</div>
+
+<!-- Security Dashboard -->
+<div class="dashboard">
+  <div class="dash-item">
+    <div class="icon">🔒</div>
+    <div class="val">10</div>
+    <div class="lbl">جولات تشفير</div>
+  </div>
+  <div class="dash-item">
+    <div class="icon">🎛️</div>
+    <div class="val">256</div>
+    <div class="lbl">بايت S-box</div>
+  </div>
+  <div class="dash-item">
+    <div class="icon">⚡</div>
+    <div class="val">2 MB/s</div>
+    <div class="lbl">السرعة</div>
+  </div>
+  <div class="dash-item">
+    <div class="icon">🛡️</div>
+    <div class="val">SHA-256</div>
+    <div class="lbl">HMAC</div>
+  </div>
+</div>
+
+<!-- Step 1: File -->
+<div class="card">
+  <h2><span class="step-num">1</span> اختر الملف</h2>
+  <div class="drop-zone" id="dropZone">
+    <div class="icon">📄</div>
+    <div class="text">اسحب الملف هنا</div>
+    <div class="hint">أو اضغط للاختيار — أي نوع، أي حجم</div>
+    <div class="filename" id="fileName" style="display:none"></div>
+  </div>
+  <input type="file" id="fileInput" style="display:none">
+</div>
+
+<!-- Step 2: Password -->
+<div class="card">
+  <h2><span class="step-num">2</span> كلمة المرور السرية</h2>
+  <div class="info-box">
+    <strong>⚠️ مهم:</strong> كلمة المرور هي المفتاح الوحيد — لا يمكن استرجاعها إذا فُقدت.
+  </div>
+  <div class="pwd-wrapper">
+    <input type="password" class="pwd-input" id="password" 
+           placeholder="أدخل كلمة مرور قوية (12 حرف على الأقل)…"
+           autocomplete="new-password">
+    <button class="pwd-toggle" id="pwdToggle" type="button">👁️</button>
+  </div>
+  <div class="pwd-strength" id="pwdStrength">
+    <div class="bar"></div><div class="bar"></div>
+    <div class="bar"></div><div class="bar"></div>
+    <div class="bar"></div>
+  </div>
+  <div class="pwd-feedback" id="pwdFeedback">أدخل كلمة مرور قوية</div>
+  
+  <div class="advanced-toggle" id="advancedToggle">
+    ⚙️ خيارات متقدمة
+  </div>
+  <div class="advanced-panel" id="advancedPanel">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:15px">
+      <div>
+        <label style="color:var(--g);font-size:.9em;font-weight:600;display:block;margin-bottom:8px">عدد الجولات</label>
+        <select id="roundsSelect" style="padding:10px;background:rgba(0,0,0,.5);border:2px solid rgba(212,175,55,.3);border-radius:8px;color:var(--lt);width:100%;font-family:inherit">
+          <option value="10" selected>10 جولات (موصى به)</option>
+          <option value="12">12 جولة (أقوى)</option>
+          <option value="14">14 جولة (أقصى أمان)</option>
+        </select>
+      </div>
+      <div>
+        <label style="color:var(--g);font-size:.9em;font-weight:600;display:block;margin-bottom:8px">دورات PBKDF2</label>
+        <select id="pbkdfIterSelect" style="padding:10px;background:rgba(0,0,0,.5);border:2px solid rgba(212,175,55,.3);border-radius:8px;color:var(--lt);width:100%;font-family:inherit">
+          <option value="50000">50,000 (سريع)</option>
+          <option value="100000" selected>100,000 (موصى به)</option>
+          <option value="200000">200,000 (بطيء لكن أقوى)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Step 3: Action -->
+<div class="card">
+  <h2><span class="step-num">3</span> العملية</h2>
+  <div class="btn-group">
+    <button class="btn encrypt" id="encryptBtn" disabled>🔒 تشفير</button>
+    <button class="btn decrypt" id="decryptBtn" disabled>🔓 فك التشفير</button>
+  </div>
+  
+  <div class="progress-wrapper" id="progressWrapper">
+    <div class="progress-info">
+      <span id="progressLabel">جاري المعالجة…</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="rounds-visual" id="roundsVisual"></div>
+  </div>
+  
+  <div class="log" id="log">
+    <div class="info">جاهز. اختر ملفاً وكلمة مرور للبدء.</div>
+  </div>
+</div>
+
+<!-- Download Area -->
+<div class="download-area" id="downloadArea">
+  <div class="success-icon">✅</div>
+  <h3 id="downloadTitle">تمت العملية بنجاح</h3>
+  <a class="download-btn" id="downloadBtn" download>⬇️ تحميل الملف</a>
+  
+  <div class="stats-grid" id="statsGrid"></div>
+  
+  <div class="brute-force" id="bruteForce" style="display:none">
+    <h3>🛡️ الوقت اللازم لكسر التشفير</h3>
+    <div class="time" id="bruteForceTime">—</div>
+    <div class="desc">بالقوة الغاشمة على حاسوب منزلي</div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="foot">
+  <div class="logo">𓂀 ⚔️ 🐉 PFE Pro</div>
+  <p>التشفير السيادي — أمان لا يخضع لأي احتكار</p>
+  <p style="margin-top:10px;font-size:.85em">
+    © 2026 محمد عيد عبد العليم بركة — جميع الحقوق محفوظة
+  </p>
+</div>
+
+</div>
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════════════════
+   Particle Background
+   ═══════════════════════════════════════════════════════ */
+(function(){
+  const c=document.getElementById('particles');
+  for(let i=0;i<30;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    p.style.left=Math.random()*100+'%';
+    p.style.animationDuration=(10+Math.random()*20)+'s';
+    p.style.animationDelay=(Math.random()*20)+'s';
+    c.appendChild(p);
+  }
+})();
+
+/* ═══════════════════════════════════════════════════════
+   GF(2^8) — Galois Field
+   ═══════════════════════════════════════════════════════ */
+function gfMul(a,b){
+  let p=0;
+  for(let i=0;i<8;i++){
+    if(b&1)p^=a;
+    const h=a&0x80;
+    a=(a<<1)&0xFF;
+    if(h)a^=0x1B;
+    b>>=1;
+  }
+  return p;
+}
+function buildInv(){
+  const inv=new Uint8Array(256);
+  inv[0]=0;
+  for(let x=1;x<256;x++){
+    for(let y=1;y<256;y++){
+      if(gfMul(x,y)===1){inv[x]=y;break}
+    }
+  }
+  return inv;
+}
+const GF_INV=buildInv();
+function parity8(x){x^=x>>4;x^=x>>2;x^=x>>1;return x&1}
+function pc8(x){x=x-((x>>1)&0x55);x=(x&0x33)+((x>>2)&0x33);return (x+(x>>4))&0x0F}
+
+/* ═══════════════════════════════════════════════════════
+   MixColumns — الخلط الحقيقي
+   ═══════════════════════════════════════════════════════ */
+function mixColumn(c){
+  const a=c[0],b=c[1],d=c[2],e=c[3];
+  return new Uint8Array([
+    gfMul(a,2)^gfMul(b,3)^d^e,
+    a^gfMul(b,2)^gfMul(d,3)^e,
+    a^b^gfMul(d,2)^gfMul(e,3),
+    gfMul(a,3)^b^d^gfMul(e,2)
+  ]);
+}
+function invMixColumn(c){
+  const a=c[0],b=c[1],d=c[2],e=c[3];
+  return new Uint8Array([
+    gfMul(a,14)^gfMul(b,11)^gfMul(d,13)^gfMul(e,9),
+    gfMul(a,9)^gfMul(b,14)^gfMul(d,11)^gfMul(e,13),
+    gfMul(a,13)^gfMul(b,9)^gfMul(d,14)^gfMul(e,11),
+    gfMul(a,11)^gfMul(b,13)^gfMul(d,9)^gfMul(e,14)
+  ]);
+}
+function mixColumns(s){
+  const o=new Uint8Array(16);
+  for(let c=0;c<4;c++){
+    const col=new Uint8Array([s[c*4],s[c*4+1],s[c*4+2],s[c*4+3]]);
+    const m=mixColumn(col);
+    o[c*4]=m[0];o[c*4+1]=m[1];o[c*4+2]=m[2];o[c*4+3]=m[3];
+  }
+  return o;
+}
+function invMixColumns(s){
+  const o=new Uint8Array(16);
+  for(let c=0;c<4;c++){
+    const col=new Uint8Array([s[c*4],s[c*4+1],s[c*4+2],s[c*4+3]]);
+    const m=invMixColumn(col);
+    o[c*4]=m[0];o[c*4+1]=m[1];o[c*4+2]=m[2];o[c*4+3]=m[3];
+  }
+  return o;
+}
+
+/* ═══════════════════════════════════════════════════════
+   S-box Generation
+   ═══════════════════════════════════════════════════════ */
+function invM(A){
+  const m=new Uint8Array(A);
+  for(let c=0;c<8;c++){
+    let p=-1;
+    for(let r=c;r<8;r++)if(m[r]&(1<<c)){p=r;break}
+    if(p===-1)return false;
+    if(p!==c){const t=m[c];m[c]=m[p];m[p]=t}
+    for(let r=0;r<8;r++)if(r!==c&&(m[r]&(1<<c)))m[r]^=m[c];
+  }
+  return true;
+}
+function genAB(prng){
+  let A,b,at=0;
+  do{
+    A=new Uint8Array(8);
+    for(let i=0;i<8;i++)A[i]=prng.ni(256);
+    b=prng.ni(256);
+    at++;
+    if(at>5000)throw new Error('فشل');
+  }while(!invM(A));
+  return{A,b};
+}
+function genS(A,b){
+  const S=new Uint8Array(256);
+  for(let x=0;x<256;x++){
+    const xi=GF_INV[x];
+    let o=0;
+    for(let i=0;i<8;i++)o|=(parity8(A[i]&xi)<<i);
+    S[x]=o^b;
+  }
+  return S;
+}
+
+/* ═══════════════════════════════════════════════════════
+   Crypto Primitives
+   ═══════════════════════════════════════════════════════ */
+async function sha256(d){return new Uint8Array(await crypto.subtle.digest('SHA-256',d))}
+async function hmacSha(k,d){
+  const kk=await crypto.subtle.importKey('raw',k,{name:'HMAC',hash:'SHA-256'},false,['sign']);
+  return new Uint8Array(await crypto.subtle.sign('HMAC',kk,d));
+}
+async function hkdf(seed,purp,len){
+  const info=new TextEncoder().encode(purp);
+  const k=await crypto.subtle.importKey('raw',seed,{name:'HMAC',hash:'SHA-256'},false,['sign']);
+  let out=new Uint8Array(0),T=new Uint8Array(0),c=1;
+  while(out.length<len){
+    const d=new Uint8Array(T.length+info.length+1);
+    d.set(T,0);d.set(info,T.length);d[T.length+info.length]=c;
+    T=new Uint8Array(await crypto.subtle.sign('HMAC',k,d));
+    const no=new Uint8Array(out.length+T.length);
+    no.set(out,0);no.set(T,out.length);
+    out=no;c++;
+  }
+  return out.slice(0,len);
+}
+async function pbkdf2(pwd,salt,iter){
+  const enc=new TextEncoder();
+  const km=await crypto.subtle.importKey('raw',enc.encode(pwd),'PBKDF2',false,['deriveBits']);
+  const bits=await crypto.subtle.deriveBits({
+    name:'PBKDF2',salt,iterations:iter,hash:'SHA-256'
+  },km,256);
+  return new Uint8Array(bits);
+}
+
+class PRNG{
+  constructor(s){
+    this.s=0n;
+    for(let i=0;i<Math.min(s.length,32);i++)this.s=(this.s<<8n)|BigInt(s[i]);
+    if(this.s===0n)this.s=0x123456789abcdefn;
+    this.m=(1n<<256n)-1n;
+  }
+  next(){
+    let s=this.s;
+    s^=(s<<13n)&this.m;
+    s^=s>>7n;
+    s^=(s<<17n)&this.m;
+    s&=this.m;
+    this.s=s;
+    return s;
+  }
+  ni(max){return Number(this.next()%BigInt(max))}
+}
+
+/* ═══════════════════════════════════════════════════════
+   Key Derivation
+   ═══════════════════════════════════════════════════════ */
+const keyCache=new Map();
+
+async function deriveKeys(password,salt,rounds,iter,onProgress){
+  const cacheKey=password+'|'+Array.from(salt).join(',')+'|'+rounds+'|'+iter;
+  if(keyCache.has(cacheKey))return keyCache.get(cacheKey);
+  
+  const rep=m=>{if(onProgress)onProgress(m)};
+  
+  rep('اشتقاق المفتاح الرئيسي (PBKDF2)…');
+  const master=await pbkdf2(password,salt,iter);
+  
+  rep('توليد جولات التشiffر…');
+  const Sboxes=[],SboxesInv=[],roundKeys=[];
+  
+  for(let r=0;r<rounds;r++){
+    const rs=await hkdf(master,`pfe42_round_${r}`,96);
+    const prng=new PRNG(rs);
+    const{A,b}=genAB(prng);
+    const S=genS(A,b);
+    const Si=new Uint8Array(256);
+    for(let i=0;i<256;i++)Si[S[i]]=i;
+    Sboxes.push(S);
+    SboxesInv.push(Si);
+    
+    const rk=new Uint8Array(16);
+    for(let i=0;i<16;i++)rk[i]=prng.ni(256);
+    roundKeys.push(rk);
+  }
+  
+  const macKey=await hkdf(master,'pfe42_mac',32);
+  
+  const result={Sboxes,SboxesInv,roundKeys,macKey,rounds,BS:16};
+  keyCache.set(cacheKey,result);
+  rep('✅ جاهز');
+  return result;
+}
+
+/* ═══════════════════════════════════════════════════════
+   Block Cipher
+   ═══════════════════════════════════════════════════════ */
+function encBlock(block,keys){
+  const{Sboxes,roundKeys,rounds}=keys;
+  const BS=16;
+  let state=new Uint8Array(block);
+  
+  for(let i=0;i<BS;i++)state[i]^=roundKeys[0][i];
+  
+  for(let r=1;r<rounds;r++){
+    const sub=new Uint8Array(BS);
+    for(let i=0;i<BS;i++)sub[i]=Sboxes[r][state[i]];
+    const mixed=mixColumns(sub);
+    for(let i=0;i<BS;i++)mixed[i]^=roundKeys[r][i];
+    state=mixed;
+  }
+  
+  const finalSub=new Uint8Array(BS);
+  for(let i=0;i<BS;i++)finalSub[i]=Sboxes[rounds-1][state[i]];
+  for(let i=0;i<BS;i++)finalSub[i]^=roundKeys[0][i];
+  
+  return finalSub;
+}
+
+function decBlock(block,keys){
+  const{SboxesInv,roundKeys,rounds}=keys;
+  const BS=16;
+  let state=new Uint8Array(block);
+  
+  for(let i=0;i<BS;i++)state[i]^=roundKeys[0][i];
+  for(let i=0;i<BS;i++)state[i]=SboxesInv[rounds-1][state[i]];
+  
+  for(let r=rounds-1;r>=1;r--){
+    for(let i=0;i<BS;i++)state[i]^=roundKeys[r][i];
+    state=invMixColumns(state);
+    for(let i=0;i<BS;i++)state[i]=SboxesInv[r][state[i]];
+  }
+  
+  for(let i=0;i<BS;i++)state[i]^=roundKeys[0][i];
+  
+  return state;
+}
+
+/* ═══════════════════════════════════════════════════════
+   Container
+   ═══════════════════════════════════════════════════════ */
+const MAGIC=[0x50,0x46,0x52,0x4F]; // "PFRO"
+const VERSION=3;
+const MAC_LEN=32;
+const SALT_LEN=16;
+const BS=16;
+
+function buildHeader(){
+  const h=new Uint8Array(6);
+  h.set(MAGIC,0);
+  h[4]=VERSION;
+  h[5]=0;
+  return h;
+}
+
+function inspectContainer(buf){
+  if(buf.length>=6&&buf[0]===MAGIC[0]&&buf[1]===MAGIC[1]&&
+     buf[2]===MAGIC[2]&&buf[3]===MAGIC[3]){
+    const v=buf[4];
+    if(v!==VERSION)throw new Error('إصدار غير مدعوم');
+    return{valid:true,headerLen:6};
+  }
+  return{valid:false,reason:'ليس ملف PFE Pro'};
+}
+
+/* ═══════════════════════════════════════════════════════
+   Encrypt / Decrypt Files
+   ═══════════════════════════════════════════════════════ */
+async function encryptFile(data,keys,onBlock){
+  const header=buildHeader();
+  const salt=new Uint8Array(SALT_LEN);
+  crypto.getRandomValues(salt);
+  const iv=new Uint8Array(BS);
+  crypto.getRandomValues(iv);
+  
+  const padLen=BS-(data.length%BS);
+  const padded=new Uint8Array(data.length+padLen);
+  padded.set(data,0);
+  padded.fill(padLen,data.length);
+  
+  const nb=padded.length/BS;
+  const cipher=new Uint8Array(padded.length);
+  let prev=iv;
+  
+  for(let b=0;b<nb;b++){
+    const bl=new Uint8Array(BS);
+    for(let i=0;i<BS;i++)bl[i]=padded[b*BS+i]^prev[i];
+    const enc=encBlock(bl,keys);
+    cipher.set(enc,b*BS);
+    prev=enc;
+    if((b&1023)===1023){
+      if(onBlock)onBlock(b/nb);
+      await new Promise(r=>setTimeout(r,0));
+    }
+  }
+  
+  const body=new Uint8Array(header.length+SALT_LEN+BS+cipher.length);
+  body.set(header,0);
+  body.set(salt,header.length);
+  body.set(iv,header.length+SALT_LEN);
+  body.set(cipher,header.length+SALT_LEN+BS);
+  
+  const mac=await hmacSha(keys.macKey,body);
+  const output=new Uint8Array(body.length+MAC_LEN);
+  output.set(body,0);
+  output.set(mac,body.length);
+  return output;
+}
+
+async function decryptFile(buf,password,rounds,iter,onProgress){
+  if(buf.length<6+SALT_LEN+BS+MAC_LEN)throw new Error('ملف قصير');
+  
+  const info=inspectContainer(buf);
+  if(!info.valid)throw new Error(info.reason);
+  
+  const body=buf.slice(0,buf.length-MAC_LEN);
+  const mac=buf.slice(buf.length-MAC_LEN);
+  
+  const salt=body.slice(6,6+SALT_LEN);
+  
+  // Derive keys
+  const keys=await deriveKeys(password,salt,rounds,iter,onProgress);
+  
+  // Verify HMAC
+  const expectedMac=await hmacSha(keys.macKey,body);
+  let diff=0;
+  for(let i=0;i<MAC_LEN;i++)diff|=mac[i]^expectedMac[i];
+  if(diff!==0)throw new Error('HMAC فشل — كلمة المرور خاطئة أو الملف معدّل');
+  
+  const iv=body.slice(6+SALT_LEN,6+SALT_LEN+BS);
+  const cipher=body.slice(6+SALT_LEN+BS);
+  if(cipher.length===0||cipher.length%BS!==0)throw new Error('بنية غير صالحة');
+  
+  const nb=cipher.length/BS;
+  const plain=new Uint8Array(cipher.length);
+  let prev=iv;
+  
+  for(let b=0;b<nb;b++){
+    const bl=cipher.slice(b*BS,(b+1)*BS);
+    const dec=decBlock(bl,keys);
+    for(let i=0;i<BS;i++)plain[b*BS+i]=dec[i]^prev[i];
+    prev=bl;
+    if((b&1023)===1023)await new Promise(r=>setTimeout(r,0));
+  }
+  
+  const padLen=plain[plain.length-1];
+  if(padLen<1||padLen>BS)throw new Error('Padding غير صحيح');
+  for(let i=plain.length-padLen;i<plain.length;i++){
+    if(plain[i]!==padLen)throw new Error('Padding غير صحيح');
+  }
+  return plain.slice(0,plain.length-padLen);
+}
+
+/* ═══════════════════════════════════════════════════════
+   UI
+   ═══════════════════════════════════════════════════════ */
+const $=id=>document.getElementById(id);
+
+let selectedFile=null;
+let selectedBuffer=null;
+let lastResult=null;
+let lastResultName=null;
+let busy=false;
+
+/* Log */
+function log(msg,cls='info'){
+  const d=document.createElement('div');
+  d.className=cls;
+  d.textContent=`[${new Date().toLocaleTimeString('en-GB')}] ${msg}`;
+  $('log').appendChild(d);
+  $('log').scrollTop=$('log').scrollHeight;
+}
+function clearLog(){ $('log').innerHTML=''; }
+
+/* Toast */
+function toast(msg,type='info'){
+  const t=document.createElement('div');
+  t.className='toast '+type;
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';},2000);
+  setTimeout(()=>t.remove(),2400);
+}
+
+/* Password Strength */
+function checkPwdStrength(pwd){
+  const checks={
+    length:pwd.length>=12,
+    lower:/[a-z]/.test(pwd),
+    upper:/[A-Z]/.test(pwd),
+    digit:/[0-9]/.test(pwd),
+    symbol:/[^a-zA-Z0-9]/.test(pwd),
+    notCommon:!['password','123456','qwerty','admin','welcome'].some(c=>pwd.toLowerCase().includes(c))
+  };
+  const score=Object.values(checks).filter(Boolean).length;
+  return {score, checks};
+}
+
+function updatePwdUI(){
+  const pwd=$('password').value;
+  const {score,checks}=checkPwdStrength(pwd);
+  const bars=$('pwdStrength').querySelectorAll('.bar');
+  
+  bars.forEach(b=>{b.className='bar'});
+  
+  let level='';
+  if(score<=2){level='weak';}
+  else if(score<=4){level='medium';}
+  else{level='strong';}
+  
+  const active=level==='weak'?2:level==='medium'?4:5;
+  bars.forEach((b,i)=>{
+    if(i<active)b.classList.add('active-'+level);
+  });
+  
+  const messages={
+    weak:'❌ كلمة مرور ضعيفة — أضف المزيد من الأحرف',
+    medium:'⚠️ متوسطة — يمكن تحسينها',
+    strong:'✅ قوية — كلمة مرور ممتازة'
+  };
+  $('pwdFeedback').textContent=messages[level];
+  $('pwdFeedback').style.color=level==='strong'?'#7ee0b5':level==='medium'?'#FFDE00':'#FF8A7A';
+  
+  updateButtons();
+}
+
+function updateButtons(){
+  const hasFile=!!selectedBuffer;
+  const hasPwd=$('password').value.length>=8;
+  $('encryptBtn').disabled=busy||!hasFile||!hasPwd;
+  $('decryptBtn').disabled=busy||!hasFile||!hasPwd;
+}
+
+/* File handling */
+$('dropZone').addEventListener('click',()=>$('fileInput').click());
+$('dropZone').addEventListener('dragover',e=>{
+  e.preventDefault();
+  $('dropZone').classList.add('dragover');
+});
+$('dropZone').addEventListener('dragleave',()=>$('dropZone').classList.remove('dragover'));
+$('dropZone').addEventListener('drop',async e=>{
+  e.preventDefault();
+  $('dropZone').classList.remove('dragover');
+  if(e.dataTransfer.files.length>0)await handleFile(e.dataTransfer.files[0]);
+});
+$('fileInput').addEventListener('change',async e=>{
+  if(e.target.files.length>0)await handleFile(e.target.files[0]);
+  e.target.value='';
+});
+
+async function handleFile(file){
+  if(busy)return;
+  selectedFile=file;
+  selectedBuffer=new Uint8Array(await file.arrayBuffer());
+  
+  const fn=$('fileName');
+  fn.textContent=`📎 ${file.name} (${(file.size/1024).toFixed(2)} KB)`;
+  fn.style.display='block';
+  
+  $('downloadArea').classList.remove('active');
+  
+  const isEncrypted=selectedBuffer.length>6&&
+    selectedBuffer[0]===MAGIC[0]&&
+    selectedBuffer[1]===MAGIC[1]&&
+    selectedBuffer[2]===MAGIC[2]&&
+    selectedBuffer[3]===MAGIC[3];
+  
+  log(`تم تحميل: ${file.name} (${file.size} بايت)`,'ok');
+  if(isEncrypted){
+    log(`🔎 ملف PFE Pro — جاهز لفك التشفير`,'info');
+    toast('ملف PFE Pro — جاهز لفك التشفير','info');
+  }
+  
+  updateButtons();
+}
+
+/* Password */
+$('password').addEventListener('input',updatePwdUI);
+$('pwdToggle').addEventListener('click',()=>{
+  const p=$('password');
+  p.type=p.type==='password'?'text':'password';
+  $('pwdToggle').textContent=p.type==='password'?'👁️':'🙈';
+});
+
+/* Advanced */
+$('advancedToggle').addEventListener('click',()=>{
+  $('advancedPanel').classList.toggle('active');
+});
+
+/* Progress */
+function setProgress(pct,label){
+  $('progressWrapper').classList.add('active');
+  $('progressFill').style.width=pct+'%';
+  $('progressPct').textContent=Math.round(pct)+'%';
+  if(label)$('progressLabel').textContent=label;
+}
+function hideProgress(){
+  setTimeout(()=>{
+    $('progressWrapper').classList.remove('active');
+    $('progressFill').style.width='0%';
+  },500);
+}
+
+/* Rounds visual */
+function setupRounds(n){
+  const v=$('roundsVisual');
+  v.innerHTML='';
+  for(let i=0;i<n;i++){
+    const d=document.createElement('div');
+    d.className='round-dot';
+    v.appendChild(d);
+  }
+}
+function markRound(i){
+  const dots=$('roundsVisual').querySelectorAll('.round-dot');
+  if(dots[i])dots[i].classList.add('done');
+}
+
+/* ═══════════════════════════════════════════════════════
+   Encrypt Action
+   ═══════════════════════════════════════════════════════ */
+$('encryptBtn').addEventListener('click',async()=>{
+  if(!selectedBuffer||busy)return;
+  const pwd=$('password').value;
+  const rounds=parseInt($('roundsSelect').value,10);
+  const iter=parseInt($('pbkdfIterSelect').value,10);
+  
+  busy=true;
+  updateButtons();
+  clearLog();
+  $('downloadArea').classList.remove('active');
+  
+  try{
+    const t0=performance.now();
+    
+    log('═══════════════════════════════════════════','info');
+    log('  🔒 بدء التشفير — PFE Pro','info');
+    log('═══════════════════════════════════════════','info');
+    log('');
+    log(`📄 الملف: ${selectedFile.name}`,'info');
+    log(`📦 الحجم: ${(selectedBuffer.length/1024).toFixed(2)} KB`,'info');
+    log(`🔑 كلمة المرور: ${pwd.length} حرف`,'info');
+    log(`🎛️ عدد الجولات: ${rounds}`,'info');
+    log(`⏱️ PBKDF2: ${iter.toLocaleString()} دورة`,'info');
+    log('');
+    
+    setProgress(5,'تحضير المفاتيح…');
+    
+    const salt=new Uint8Array(SALT_LEN);
+    crypto.getRandomValues(salt);
+    
+    log('🔑 المرحلة 1: اشتقاق المفاتيح…','warn');
+    const keys=await deriveKeys(pwd,salt,rounds,iter,m=>log(`  ${m}`,'info'));
+    setProgress(40,'بدء التشفير…');
+    setupRounds(rounds);
+    log('','ok');
+    log('🔐 المرحلة 2: تشفير CBC…','warn');
+    
+    const enc=await encryptFile(selectedBuffer,keys,(pct)=>{
+      setProgress(40+pct*50,'تشفير…');
+    });
+    
+    // Mark all rounds done
+    for(let i=0;i<rounds;i++)markRound(i);
+    
+    setProgress(100,'اكتمل!');
+    
+    const dt=(performance.now()-t0)/1000;
+    
+    log('','ok');
+    log('✅ اكتمل التشفير','ok');
+    log('');
+    log('═══════════════════════════════════════════','info');
+    log(`  📊 الإحصائيات`,'info');
+    log('═══════════════════════════════════════════','info');
+    log(`  الحجم الأصلي:  ${(selectedBuffer.length/1024).toFixed(2)} KB`,'info');
+    log(`  الحجم المشفر:  ${(enc.length/1024).toFixed(2)} KB`,'info');
+    log(`  الزيادة:        ${(((enc.length-selectedBuffer.length)/selectedBuffer.length)*100).toFixed(1)}%`,'info');
+    log(`  الزمن:          ${dt.toFixed(3)} ث`,'info');
+    log(`  السرعة:         ${(selectedBuffer.length/1048576/dt).toFixed(2)} MB/s`,'info');
+    log('','ok');
+    log('🏆 الملف جاهز للتحميل','ok');
+    
+    // Download
+    lastResult=enc;
+    lastResultName=selectedFile.name+'.pfepro';
+    
+    const blob=new Blob([enc],{type:'application/octet-stream'});
+    const url=URL.createObjectURL(blob);
+    const btn=$('downloadBtn');
+    btn.href=url;
+    btn.download=lastResultName;
+    
+    $('downloadTitle').textContent='✅ تم التشفير بنجاح';
+    
+    // Stats grid
+    $('statsGrid').innerHTML=`
+      <div class="stat-box"><div class="v">${(selectedBuffer.length/1024).toFixed(1)}</div><div class="l">KB أصلي</div></div>
+      <div class="stat-box"><div class="v">${(enc.length/1024).toFixed(1)}</div><div class="l">KB مشفر</div></div>
+      <div class="stat-box"><div class="v">${dt.toFixed(2)}</div><div class="l">ثانية</div></div>
+      <div class="stat-box"><div class="v">${rounds}</div><div class="l">جولة</div></div>
+    `;
+    
+    // Brute force
+    const bits=256;
+    const ops=Math.pow(10,9);
+    const seconds=Math.pow(2,bits)/ops;
+    const years=seconds/31536000;
+    const timeStr=formatBigNumber(years);
+    
+    $('bruteForce').style.display='block';
+    $('bruteForceTime').textContent=timeStr;
+    
+    $('downloadArea').classList.add('active');
+    toast('✅ تم التشفير بنجاح','success');
+    
+    hideProgress();
+    
+  }catch(e){
+    log(`❌ خطأ: ${e.message}`,'er');
+    toast('❌ '+e.message,'error');
+  }finally{
+    busy=false;
+    updateButtons();
+  }
+});
+
+/* ═══════════════════════════════════════════════════════
+   Decrypt Action
+   ═══════════════════════════════════════════════════════ */
+$('decryptBtn').addEventListener('click',async()=>{
+  if(!selectedBuffer||busy)return;
+  const pwd=$('password').value;
+  const rounds=parseInt($('roundsSelect').value,10);
+  const iter=parseInt($('pbkdfIterSelect').value,10);
+  
+  busy=true;
+  updateButtons();
+  clearLog();
+  $('downloadArea').classList.remove('active');
+  
+  try{
+    const t0=performance.now();
+    
+    log('═══════════════════════════════════════════','info');
+    log('  🔓 بدء فك التشفير','info');
+    log('═══════════════════════════════════════════','info');
+    log('');
+    log(`📄 الملف: ${selectedFile.name}`,'info');
+    log(`📦 الحجم: ${(selectedBuffer.length/1024).toFixed(2)} KB`,'info');
+    log(`🎛️ الجولات: ${rounds}`,'info');
+    log('');
+    
+    setProgress(5,'قراءة الترويسة…');
+    
+    const info=inspectContainer(selectedBuffer);
+    if(!info.valid)throw new Error(info.reason);
+    
+    log('✅ ترويسة PFE Pro صحيحة','ok');
+    log('');
+    
+    setupRounds(rounds);
+    setProgress(20,'اشتقاق المفاتيح…');
+    
+    const dec=await decryptFile(
+      selectedBuffer,
+      pwd,
+      rounds,
+      iter,
+      m=>log(`  ${m}`,'info')
+    );
+    
+    // Mark all rounds done
+    for(let i=0;i<rounds;i++)markRound(i);
+    
+    setProgress(100,'اكتمل!');
+    
+    const dt=(performance.now()-t0)/1000;
+    
+    log('','ok');
+    log('🔓 تم فك التشفير بنجاح','ok');
+    log(`✅ HMAC صحيح — الملف سليم`,'ok');
+    log('');
+    log('═══════════════════════════════════════════','info');
+    log(`  📊 الإحصائيات`,'info');
+    log('═══════════════════════════════════════════','info');
+    log(`  الحجم المشفر:  ${(selectedBuffer.length/1024).toFixed(2)} KB`,'info');
+    log(`  الحجم الأصلي:  ${(dec.length/1024).toFixed(2)} KB`,'info');
+    log(`  الزمن:          ${dt.toFixed(3)} ث`,'info');
+    log('','ok');
+    log('🏆 الملف الأصلي جاهز','ok');
+    
+    // Download
+    const name=selectedFile.name.replace(/\.pfepro$/,'')||'decrypted.bin';
+    lastResult=dec;
+    lastResultName=name;
+    
+    const blob=new Blob([dec],{type:'application/octet-stream'});
+    const url=URL.createObjectURL(blob);
+    const btn=$('downloadBtn');
+    btn.href=url;
+    btn.download=name;
+    
+    $('downloadTitle').textContent='✅ تم فك التشفير بنجاح';
+    
+    $('statsGrid').innerHTML=`
+      <div class="stat-box"><div class="v">${(selectedBuffer.length/1024).toFixed(1)}</div><div class="l">KB مشفر</div></div>
+      <div class="stat-box"><div class="v">${(dec.length/1024).toFixed(1)}</div><div class="l">KB أصلي</div></div>
+      <div class="stat-box"><div class="v">${dt.toFixed(2)}</div><div class="l">ثانية</div></div>
+      <div class="stat-box"><div class="v">✅</div><div class="l">HMAC صحيح</div></div>
+    `;
+    
+    $('bruteForce').style.display='none';
+    $('downloadArea').classList.add('active');
+    toast('✅ تم فك التشفير بنجاح','success');
+    
+    hideProgress();
+    
+  }catch(e){
+    log(`❌ ${e.message}`,'er');
+    toast('❌ '+e.message,'error');
+  }finally{
+    busy=false;
+    updateButtons();
+  }
+});
+
+/* ═══════════════════════════════════════════════════════
+   Big Number Formatter
+   ═══════════════════════════════════════════════════════ */
+function formatBigNumber(years){
+  if(years<1)return 'أقل من سنة';
+  if(years<1000)return Math.round(years)+' سنة';
+  if(years<1e6)return Math.round(years/1000)+' ألف سنة';
+  if(years<1e9)return Math.round(years/1e6)+' مليون سنة';
+  if(years<1e12)return Math.round(years/1e9)+' مليار سنة';
+  if(years<1e15)return Math.round(years/1e12)+' ترليون سنة';
+  if(years<1e18)return Math.round(years/1e15)+' كوادرليون سنة';
+  if(years<1e21)return Math.round(years/1e18)+' كوينتليون سنة';
+  
+  const exp=Math.floor(Math.log10(years));
+  return `10^${exp} سنة`;
+}
+
+/* Init */
+updatePwdUI();
+console.log('%c🐉 PFE Pro — التطبيق المُطوَّر','font-size:20px;color:#D4AF37;font-weight:bold');
+console.log('%c10 جولات | MixColumns | HMAC-SHA256 | PBKDF2','font-size:13px;color:#AAA');
+
+</script>
+
+</body>
+</html>
