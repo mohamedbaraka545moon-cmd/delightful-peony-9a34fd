@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baraka Forbidden Space Protocol (BFSP) - Experimental</title>
+    <meta name="author" content="Mohamed Eid Abdel Aleem Baraka">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0a0d14; --panel: #111827; --panel-2: #1a2332; --border: #1e293b;
+            --text: #e5e7eb; --text-muted: #94a3b8; --accent: #38bdf8;
+            --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
+        }
+        body { font-family: 'Georgia', 'Amiri', 'Segoe UI', serif; background: var(--bg); color: var(--text); line-height: 1.8; padding: 24px 16px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        header { text-align: center; padding: 40px 24px; border-bottom: 3px solid var(--accent); margin-bottom: 32px; }
+        header h1 { font-size: 26px; color: var(--accent); font-weight: 700; margin-bottom: 8px; }
+        header .subtitle { font-size: 14px; color: var(--text-muted); font-style: italic; margin-bottom: 24px; }
+        header .author { font-size: 17px; color: var(--warning); font-weight: 600; margin-bottom: 4px; }
+        header .author-en { font-size: 13px; color: var(--text-muted); font-style: italic; margin-bottom: 16px; }
+        header .version { display: inline-block; padding: 4px 14px; background: var(--panel); border: 1px solid var(--border); border-radius: 20px; font-size: 11px; color: var(--accent); font-family: monospace; }
+        
+        section { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 24px; }
+        section h2 { color: var(--accent); font-size: 19px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+        
+        .lang-block { padding: 20px 24px; border-radius: 8px; margin-bottom: 20px; background: var(--panel-2); }
+        .lang-block.en { direction: ltr; text-align: left; border-left: 4px solid var(--accent); }
+        .lang-block.ar { direction: rtl; text-align: right; border-right: 4px solid var(--warning); }
+        .lang-label { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; padding: 3px 10px; border-radius: 4px; margin-bottom: 12px; font-family: monospace; }
+        .lang-block.en .lang-label { background: var(--accent); color: var(--bg); }
+        .lang-block.ar .lang-label { background: var(--warning); color: var(--bg); }
+        
+        .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        @media (max-width: 800px) { .tool-grid { grid-template-columns: 1fr; } }
+        .tool-panel { background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+        .tool-panel h3 { color: var(--accent); font-size: 16px; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+        
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
+        input[type="password"], input[type="file"] { width: 100%; padding: 11px 14px; border-radius: 8px; border: 1px solid var(--border); background: #050608; color: var(--text); font-size: 14px; }
+        
+        button { width: 100%; padding: 13px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 14px; transition: 0.2s; margin-top: 8px; }
+        .btn-primary { background: var(--accent); color: var(--bg); }
+        .btn-primary:hover:not(:disabled) { background: #0ea5e9; }
+        .btn-success { background: var(--success); color: var(--bg); }
+        button:disabled { opacity: 0.4; cursor: not-allowed; }
+        
+        .progress { height: 6px; background: var(--border); border-radius: 3px; margin-top: 14px; overflow: hidden; display: none; }
+        .progress.visible { display: block; }
+        .progress-bar { height: 100%; background: var(--accent); width: 0%; transition: width 0.2s; }
+        
+        .status { margin-top: 14px; padding: 12px 14px; border-radius: 8px; font-size: 13px; display: none; }
+        .status.visible { display: block; }
+        .status.success { background: rgba(16, 185, 129, 0.1); color: #6ee7b7; border: 1px solid var(--success); }
+        .status.error { background: rgba(239, 68, 68, 0.1); color: #fca5a5; border: 1px solid var(--danger); }
+        .status.info { background: rgba(56, 189, 248, 0.1); color: #93c5fd; border: 1px solid var(--accent); }
+
+        /* زر التحميل المضمون */
+        .dl-btn {
+            display: none;
+            width: 100%;
+            padding: 15px;
+            background: var(--success);
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        
+        #canvas3d { width: 100%; height: 380px; background: #050608; border-radius: 8px; border: 1px solid var(--border); margin-top: 16px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Baraka Forbidden Space Protocol</h1>
+        <div class="subtitle">BFSP — Experimental Environment</div>
+        <div class="author">الأستاذ / محمد عيد عبد العليم بركة</div>
+        <div class="author-en">Mohamed Eid Abdel Aleem Baraka</div>
+        <div class="version">BFSP v1.0 · Forbidden Space Hypothesis</div>
+    </header>
+
+    <section>
+        <div class="lang-block en">
+            <span class="lang-label">ABSTRACT</span>
+            <p>
+                The <strong>Baraka Forbidden Space Protocol (BFSP)</strong> is an advanced cryptographic framework that harnesses the continuous trajectory of a three-dimensional dynamical system. The encrypted payload is transformed into a moving target, navigating a continuous state space dictated by the integration constant <em>C</em>.
+            </p>
+        </div>
+        <div class="lang-block ar">
+            <span class="lang-label">الملخص</span>
+            <p>
+                يُقدّم <strong>بروتوكول المساحة المحرمة لبركة (BFSP)</strong> إطاراً تشفيرياً متقدماً يعتمد على المسار المستمر لنظام ديناميكي ثلاثي الأبعاد. يتحول الملف المشفر إلى "هدف متحرك" يبحر في فضاء حالة مستمر يحدده ثابت التكامل <em>C</em>.
+            </p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Interactive Tool · الأداة التفاعلية</h2>
+        <div class="tool-grid">
+            <!-- ENCRYPT -->
+            <div class="tool-panel">
+                <h3>🔒 Encrypt · التشفير</h3>
+                <div class="form-group">
+                    <label>Password · مفتاح التوليد (16+ chars)</label>
+                    <input type="password" id="encPassword" placeholder="••••••••••••••••">
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password · تأكيد المفتاح</label>
+                    <input type="password" id="encPassword2" placeholder="••••••••••••••••">
+                </div>
+                <div class="form-group">
+                    <label>Select File · اختر الملف</label>
+                    <input type="file" id="encFile">
+                </div>
+                <button class="btn-primary" id="encBtn" onclick="encryptFile()" disabled>🔐 Encrypt · تشفير</button>
+                
+                <div class="progress" id="encProgress"><div class="progress-bar" id="encProgressBar"></div></div>
+                <div class="status" id="encStatus"></div>
+                <!-- رابط التحميل المباشر -->
+                <a id="encDlBtn" class="dl-btn" href="#">⬇️ اضغط هنا لحفظ الملف المشفر (.bfsp)</a>
+            </div>
+            
+            <!-- DECRYPT -->
+            <div class="tool-panel">
+                <h3>🔓 Decrypt · فك التشفير</h3>
+                <div class="form-group">
+                    <label>Password · المفتاح</label>
+                    <input type="password" id="decPassword" placeholder="••••••••••••••••">
+                </div>
+                <div class="form-group">
+                    <label>Select File (.bfsp) · الملف المشفر</label>
+                    <input type="file" id="decFile" accept=".bfsp">
+                </div>
+                <button class="btn-success" id="decBtn" onclick="decryptFile()" disabled>🔓 Decrypt · فك التشفير</button>
+                
+                <div class="progress" id="decProgress"><div class="progress-bar" id="decProgressBar"></div></div>
+                <div class="status" id="decStatus"></div>
+                <!-- رابط التحميل المباشر -->
+                <a id="decDlBtn" class="dl-btn" href="#">⬇️ اضغط هنا لاستعادة الملف الأصلي</a>
+            </div>
+        </div>
+        
+        <h3 style="color: var(--accent); margin-top: 32px; margin-bottom: 12px;">🌌 Forbidden Space Simulation</h3>
+        <div id="canvas3d"></div>
+    </section>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// WEB WORKER
+// ═══════════════════════════════════════════════════════════════
+const workerCode = `
+    function generateKeystream(t0, nonce, length) {
+        let t = t0;
+        for (let i = 0; i < nonce.length; i++) t += nonce[i] / Math.pow(256, (i % 8) + 1);
+        let x = 2.0, y = 0.0, z = 1.0;
+        const dt = 0.01;
+        const C = Math.cos(Math.sinh(t0 % 3)) * 15.485863;
+        const ks = new Uint8Array(length);
+        for (let i = 0; i < length; i++) {
+            const sinSq = Math.pow(Math.sin(Math.PI * x), 2);
+            const coshX = Math.cosh(((x % 4) + 4) % 4) || 1;
+            const coshY = Math.cosh(y) || 1;
+            x += (((sinSq - y) / coshX) + C) * dt;
+            y += Math.sin(t) * dt;
+            z += (Math.cos(x + t) / coshY) * dt;
+            t += dt;
+            x = ((x % 20) + 20) % 20 - 10;
+            y = ((y % 20) + 20) % 20 - 10;
+            z = ((z % 20) + 20) % 20 - 10;
+            const m1 = Math.floor((x + 10) * 1e6) | 0;
+            const m2 = Math.floor((y + 10) * 1e6) | 0;
+            const m3 = Math.floor((z + 10) * 1e6) | 0;
+            ks[i] = (((m1 ^ m2 ^ m3) ^ ((m1 >>> 8) * 31)) ^ (m2 * 17)) & 0xFF;
+        }
+        return ks;
+    }
+
+    async function deriveKeyMaterial(password, salt) {
+        const enc = new TextEncoder();
+        const keyMat = await crypto.subtle.importKey('raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveBits']);
+        const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: 1000000, hash: 'SHA-256' }, keyMat, 512);
+        const bitsArr = new Uint8Array(bits);
+        const t0 = new DataView(bitsArr.buffer, 0, 8).getFloat64(0, true);
+        const hmacKey = await crypto.subtle.importKey('raw', bitsArr.slice(8, 40), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']);
+        return { t0, hmacKey };
+    }
+
+    self.onmessage = async function(e) {
+        const { action, password, fileBuffer, nonce, salt, headerBytes, ciphertext, signature } = e.data;
+        try {
+            if (action === 'encrypt') {
+                self.postMessage({ type: 'progress', pct: 10, msg: '🔐 Generating keys...' });
+                const { t0, hmacKey } = await deriveKeyMaterial(password, salt);
+                
+                self.postMessage({ type: 'progress', pct: 40, msg: '🌌 Generating keystream (ODE)...' });
+                const ks = generateKeystream(t0, nonce, fileBuffer.length);
+                
+                self.postMessage({ type: 'progress', pct: 70, msg: '🔒 Encrypting (XOR)...' });
+                const ciphertext = new Uint8Array(fileBuffer.length);
+                for (let i = 0; i < fileBuffer.length; i++) ciphertext[i] = fileBuffer[i] ^ ks[i];
+                
+                self.postMessage({ type: 'progress', pct: 90, msg: '✍️ Signing (HMAC)...' });
+                const authInput = new Uint8Array(salt.length + nonce.length + headerBytes.length + ciphertext.length);
+                let off = 0;
+                authInput.set(salt, off); off += salt.length;
+                authInput.set(nonce, off); off += nonce.length;
+                authInput.set(headerBytes, off); off += headerBytes.length;
+                authInput.set(ciphertext, off);
+                
+                const sig = new Uint8Array(await crypto.subtle.sign('HMAC', hmacKey, authInput));
+                self.postMessage({ type: 'done', sig, ciphertext });
+            } 
+            else if (action === 'decrypt') {
+                self.postMessage({ type: 'progress', pct: 10, msg: '🧬 Re-deriving key...' });
+                const { t0, hmacKey } = await deriveKeyMaterial(password, salt);
+                
+                self.postMessage({ type: 'progress', pct: 40, msg: '🔏 Verifying HMAC...' });
+                const authInput = new Uint8Array(salt.length + nonce.length + headerBytes.length + ciphertext.length);
+                let off = 0;
+                authInput.set(salt, off); off += salt.length;
+                authInput.set(nonce, off); off += nonce.length;
+                authInput.set(headerBytes, off); off += headerBytes.length;
+                authInput.set(ciphertext, off);
+                
+                const valid = await crypto.subtle.verify('HMAC', hmacKey, signature, authInput);
+                if (!valid) throw new Error('HMAC verification failed — invalid key or tampered file');
+                
+                self.postMessage({ type: 'progress', pct: 70, msg: '🌌 Regenerating keystream...' });
+                const ks = generateKeystream(t0, nonce, ciphertext.length);
+                
+                self.postMessage({ type: 'progress', pct: 90, msg: '🔓 Decrypting...' });
+                const plaintext = new Uint8Array(ciphertext.length);
+                for (let i = 0; i < ciphertext.length; i++) plaintext[i] = ciphertext[i] ^ ks[i];
+                
+                self.postMessage({ type: 'done', plaintext });
+            }
+        } catch (err) {
+            self.postMessage({ type: 'error', msg: err.message });
+        }
+    };
+`;
+
+const workerBlob = new Blob([workerCode], { type: 'application/javascript' });
+const worker = new Worker(URL.createObjectURL(workerBlob));
+
+// UI Listeners
+document.getElementById('encPassword').addEventListener('input', checkEnc);
+document.getElementById('encPassword2').addEventListener('input', checkEnc);
+document.getElementById('encFile').addEventListener('change', checkEnc);
+document.getElementById('decPassword').addEventListener('input', checkDec);
+document.getElementById('decFile').addEventListener('change', checkDec);
+
+function checkEnc() {
+    const p = document.getElementById('encPassword').value;
+    const p2 = document.getElementById('encPassword2').value;
+    const f = document.getElementById('encFile').files.length;
+    document.getElementById('encBtn').disabled = !(p.length >= 16 && p === p2 && f > 0);
+}
+function checkDec() {
+    const p = document.getElementById('decPassword').value;
+    const f = document.getElementById('decFile').files.length;
+    document.getElementById('decBtn').disabled = !(p.length > 0 && f > 0);
+}
+function showStatus(el, type, msg) { 
+    el.className = 'status visible ' + type; 
+    el.innerHTML = msg; 
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+}
+function setProgress(bar, pct) { bar.style.width = pct + '%'; }
+
+// ENCRYPT
+async function encryptFile() {
+    const password = document.getElementById('encPassword').value;
+    const file = document.getElementById('encFile').files[0];
+    const status = document.getElementById('encStatus');
+    const progress = document.getElementById('encProgress');
+    const bar = document.getElementById('encProgressBar');
+    const dlBtn = document.getElementById('encDlBtn');
+    
+    dlBtn.style.display = 'none'; // إخفاء الزر حتى ينتهي التشفير
+    
+    progress.classList.add('visible');
+    setProgress(bar, 5);
+    showStatus(status, 'info', '⏳ Preparing...');
+
+    const fileBuf = await file.arrayBuffer();
+    const nonce = crypto.getRandomValues(new Uint8Array(32));
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const header = { v: 1, nonce: Array.from(nonce), salt: Array.from(salt), name: file.name, size: file.size, ts: new Date().toISOString() };
+    const headerBytes = new TextEncoder().encode(JSON.stringify(header));
+
+    worker.onmessage = function(e) {
+        if (e.data.type === 'progress') {
+            setProgress(bar, e.data.pct);
+            showStatus(status, 'info', e.data.msg);
+        } else if (e.data.type === 'done') {
+            const { sig, ciphertext } = e.data;
+            const total = 4 + 2 + 4 + headerBytes.length + 32 + ciphertext.length;
+            const pkg = new Uint8Array(total);
+            let p = 0;
+            pkg[p++]=0x42; pkg[p++]=0x46; pkg[p++]=0x53; pkg[p++]=0x50; 
+            pkg[p++]=0x00; pkg[p++]=0x01;
+            new DataView(pkg.buffer, p, 4).setUint32(0, headerBytes.length, false); p += 4;
+            pkg.set(headerBytes, p); p += headerBytes.length;
+            pkg.set(sig, p); p += 32;
+            pkg.set(ciphertext, p);
+            
+            setProgress(bar, 100);
+            const blob = new Blob([pkg], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            
+            setTimeout(() => {
+                progress.classList.remove('visible');
+                showStatus(status, 'success', `✅ Encryption complete<br>File: ${file.name}.bfsp<br>HMAC: ✅ embedded`);
+                
+                // تفعيل رابط التحميل المباشر
+                dlBtn.href = url;
+                dlBtn.download = file.name + '.bfsp';
+                dlBtn.style.display = 'block';
+                dlBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 400);
+        } else if (e.data.type === 'error') {
+            progress.classList.remove('visible');
+            showStatus(status, 'error', '❌ Error: ' + e.data.msg);
+        }
+    };
+
+    worker.postMessage({ action: 'encrypt', password, fileBuffer: new Uint8Array(fileBuf), nonce, salt, headerBytes });
+}
+
+// DECRYPT
+async function decryptFile() {
+    const password = document.getElementById('decPassword').value;
+    const file = document.getElementById('decFile').files[0];
+    const status = document.getElementById('decStatus');
+    const progress = document.getElementById('decProgress');
+    const bar = document.getElementById('decProgressBar');
+    const dlBtn = document.getElementById('decDlBtn');
+    
+    dlBtn.style.display = 'none'; 
+    
+    progress.classList.add('visible');
+    setProgress(bar, 5);
+    showStatus(status, 'info', '⏳ Parsing package...');
+
+    const pkg = new Uint8Array(await file.arrayBuffer());
+    if (pkg[0] !== 0x42 || pkg[1] !== 0x46 || pkg[2] !== 0x53 || pkg[3] !== 0x50) {
+        progress.classList.remove('visible');
+        return showStatus(status, 'error', '❌ Not a valid BFSP file (Magic bytes mismatch)');
+    }
+    
+    const hLen = new DataView(pkg.buffer, 6, 4).getUint32(0, false);
+    const headerBytes = pkg.slice(10, 10 + hLen);
+    const header = JSON.parse(new TextDecoder().decode(headerBytes));
+    const sig = pkg.slice(10 + hLen, 10 + hLen + 32);
+    const ciphertext = pkg.slice(10 + hLen + 32);
+
+    worker.onmessage = function(e) {
+        if (e.data.type === 'progress') {
+            setProgress(bar, e.data.pct);
+            showStatus(status, 'info', e.data.msg);
+        } else if (e.data.type === 'done') {
+            const { plaintext } = e.data;
+            setProgress(bar, 100);
+            
+            const blob = new Blob([plaintext]);
+            const url = URL.createObjectURL(blob);
+            
+            setTimeout(() => {
+                progress.classList.remove('visible');
+                showStatus(status, 'success', `✅ Decryption complete<br>File: ${header.name}<br><strong style="color: var(--success);">✓ HMAC verified</strong>`);
+                
+                // تفعيل رابط التحميل المباشر
+                dlBtn.href = url;
+                dlBtn.download = header.name || 'decrypted_file';
+                dlBtn.style.display = 'block';
+                dlBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 400);
+        } else if (e.data.type === 'error') {
+            progress.classList.remove('visible');
+            showStatus(status, 'error', '❌ ' + e.data.msg);
+        }
+    };
+
+    worker.postMessage({ action: 'decrypt', password, nonce: new Uint8Array(header.nonce), salt: new Uint8Array(header.salt), headerBytes, ciphertext, signature: sig });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 3D VISUALIZATION
+// ═══════════════════════════════════════════════════════════════
+const container = document.getElementById('canvas3d');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(container.clientWidth, container.clientHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+container.appendChild(renderer.domElement);
+camera.position.set(0, 6, 14);
+camera.lookAt(0, 0, 0);
+
+scene.add(new THREE.GridHelper(20, 20, 0x1e293b, 0x1e293b));
+const shell = new THREE.Mesh(new THREE.SphereGeometry(5, 32, 32), new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.12 }));
+scene.add(shell);
+
+function buildTrajectory(t0, n) {
+    let x = 2.0, y = 0.0, z = 1.0, t = t0;
+    const dt = 0.05, C = Math.cos(Math.sinh(t0 % 3)) * 15.485863, pts = [];
+    for (let i = 0; i < n; i++) {
+        const sinSq = Math.pow(Math.sin(Math.PI * x), 2), coshX = Math.cosh(((x % 4) + 4) % 4) || 1, coshY = Math.cosh(y) || 1;
+        x += ((sinSq - y) / coshX + C) * dt; y += Math.sin(t) * dt; z += (Math.cos(x + t) / coshY) * dt; t += dt;
+        x = ((x % 10) + 10) % 10 - 5; y = ((y % 10) + 10) % 10 - 5; z = ((z % 10) + 10) % 10 - 5;
+        pts.push(new THREE.Vector3(x, y, z));
+    }
+    return pts;
+}
+
+const trajPts = buildTrajectory(73.1094, 500);
+const trajLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(trajPts), new THREE.LineBasicMaterial({ color: 0x34d399 }));
+scene.add(trajLine);
+
+const payload = new THREE.Mesh(new THREE.SphereGeometry(0.15, 16, 16), new THREE.MeshBasicMaterial({ color: 0xfbbf24 }));
+scene.add(payload);
+
+let idx = 0;
+function animate() {
+    requestAnimationFrame(animate);
+    idx = (idx + 1) % trajPts.length;
+    payload.position.copy(trajPts[idx]);
+    trajLine.rotation.y += 0.003;
+    shell.rotation.x += 0.0008; shell.rotation.y += 0.0012;
+    renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+    const w = container.clientWidth, h = container.clientHeight;
+    camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h);
+});
+</script>
+</body>
+</html>
