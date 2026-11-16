@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baraka Chaos Mapping: The Butterfly Effect</title>
+    <meta name="author" content="Mohamed Eid Abdel Aleem Baraka">
+    <meta name="description" content="تطبيق المعادلة الأم لنظرية بركة على نظام لورينز (تأثير الفراشة) في المساحة المحرمة">
+    
+    <!-- مكتبات الرياضيات والرسم -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0a0d14; --panel: #111827; --panel-2: #1a2332; --border: #1e293b;
+            --text: #e5e7eb; --text-muted: #94a3b8; --accent: #38bdf8;
+            --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
+            --butterfly: #a855f7;
+        }
+        body { font-family: 'Georgia', 'Amiri', 'Segoe UI', serif; background: var(--bg); color: var(--text); line-height: 1.8; padding: 24px 16px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        
+        header { text-align: center; padding: 40px 24px; border-bottom: 3px solid var(--butterfly); margin-bottom: 32px; }
+        header h1 { font-size: 26px; color: var(--butterfly); font-weight: 700; margin-bottom: 8px; }
+        header .subtitle { font-size: 14px; color: var(--text-muted); font-style: italic; margin-bottom: 24px; }
+        header .author { font-size: 17px; color: var(--warning); font-weight: 600; margin-bottom: 4px; }
+        header .author-en { font-size: 13px; color: var(--text-muted); font-style: italic; margin-bottom: 16px; }
+        header .version { display: inline-block; padding: 4px 14px; background: var(--panel); border: 1px solid var(--border); border-radius: 20px; font-size: 11px; color: var(--butterfly); font-family: monospace; }
+        
+        section { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 24px; }
+        section h2 { color: var(--butterfly); font-size: 19px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+        
+        .lang-block { padding: 20px 24px; border-radius: 8px; margin-bottom: 20px; background: var(--panel-2); }
+        .lang-block.en { direction: ltr; text-align: left; border-left: 4px solid var(--butterfly); }
+        .lang-block.ar { direction: rtl; text-align: right; border-right: 4px solid var(--warning); }
+        .lang-label { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; padding: 3px 10px; border-radius: 4px; margin-bottom: 12px; font-family: monospace; }
+        .lang-block.en .lang-label { background: var(--butterfly); color: #fff; }
+        .lang-block.ar .lang-label { background: var(--warning); color: var(--bg); }
+
+        .math-block { background: #050608; border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 16px 0; text-align: center; overflow-x: auto; direction: ltr; }
+        
+        .simulation-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            background: #000;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        #canvas3d { width: 100%; height: 100%; }
+        
+        .controls {
+            display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        button { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-family: inherit; transition: 0.2s; }
+        .btn-start { background: var(--success); color: #fff; }
+        .btn-reset { background: var(--danger); color: #fff; }
+        .btn-start:hover { background: #059669; }
+        .btn-reset:hover { background: #b91c1c; }
+
+        .info-box { background: rgba(168, 85, 247, 0.1); border-right: 4px solid var(--butterfly); padding: 16px; border-radius: 8px; margin-top: 20px; font-size: 14px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Baraka Chaos Mapping</h1>
+        <div class="subtitle">Applying the Mother Equation to the Butterfly Effect</div>
+        <div class="author">الأستاذ / محمد عيد عبد العليم بركة</div>
+        <div class="author-en">Mohamed Eid Abdel Aleem Baraka</div>
+        <div class="version">Universe Models v1.0 · Lorenz Attractor</div>
+    </header>
+
+    <section>
+        <div class="lang-block en">
+            <span class="lang-label">ABSTRACT</span>
+            <p>
+                This simulation applies the <strong>Baraka Mother Equation</strong> to the <strong>Lorenz Attractor</strong>, the mathematical model that gave birth to Chaos Theory and the Butterfly Effect. By mapping the system's chaotic trajectory within the <em>Forbidden Space</em>, we demonstrate how infinitesimally close initial states diverge exponentially, proving that every path in the universe is unique and non-repeating (\(R=0\)).
+            </p>
+        </div>
+        <div class="lang-block ar">
+            <span class="lang-label">الملخص</span>
+            <p>
+                تُطبق هذه المحاكاة <strong>المعادلة الأم لبركة</strong> على <strong>جاذب لورينز (Lorenz Attractor)</strong>، النموذج الرياضي الذي أنتج نظرية الفوضى و"تأثير الفراشة". من خلال رسم المسار الفوضوي للنظام داخل <em>المساحة المحرمة</em>، نُبرهن على كيف أن الحالات الابتدائية المتقاربة جداً تتباعد أسياً، مما يثبت أن كل مسار في الكون فريد ولا يتكرر (\(R=0\)).
+            </p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Mathematical Foundations · الأسس الرياضية</h2>
+        <p style="text-align: right; margin-bottom: 10px;">
+            المعادلة الأم لبركة (المساحة الحاضنة):
+        </p>
+        <div class="math-block">
+            \[
+            y(t) = -\frac{\sin^2(\Phi(t)+C)}{\cosh(t)}, \quad z(t) = -\frac{\cos^2(\Phi(t)+C)}{\cosh(t)}
+            \]
+        </div>
+        <p style="text-align: right; margin-bottom: 10px;">
+            معادلات لورينز (النظام الفوضوي الذي يحدد المسار):
+        </p>
+        <div class="math-block">
+            \[
+            \begin{cases}
+            \dfrac{dx}{dt} = \sigma(y - x) \\
+            \dfrac{dy}{dt} = x(\rho - z) - y \\
+            \dfrac{dz}{dt} = xy - \beta z
+            \end{cases}
+            \]
+        </div>
+    </section>
+
+    <section>
+        <h2>Interactive Simulation · المحاكاة التفاعلية</h2>
+        
+        <div class="simulation-container">
+            <div id="canvas3d"></div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn-start" id="btnStart" onclick="toggleSim()">▶ بدء المحاكاة / إيقاف</button>
+            <button class="btn-reset" onclick="resetSim()">🔄 إعادة التعيين</button>
+        </div>
+
+        <div class="info-box">
+            <strong>🧠 تأثير الفراشة داخل المساحة المحرمة:</strong><br>
+            النقاط المضيئة هي "حالة النظام" (x,y,z) في لحظة زمنية معينة. لاحظ كيف تتحرك في مسار حلزوني (الفراشة) دون أن تتقاطع مع نفسها أبداً. هذا هو الدليل الرياضي على أن المسار فريد ولا يتكرر، مما يحقق شرط \(R=0\) في المعادلة الأم.
+        </div>
+    </section>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// THREE.JS SETUP
+// ═══════════════════════════════════════════════════════════════
+const container = document.getElementById('canvas3d');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+
+renderer.setSize(container.clientWidth, container.clientHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+container.appendChild(renderer.domElement);
+
+camera.position.set(0, 0, 60);
+
+// إضاءة خفيفة
+scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+// ═══════════════════════════════════════════════════════════════
+// BARAKA FORBIDDEN SPACE (Envelope)
+// ═══════════════════════════════════════════════════════════════
+const shellGeo = new THREE.SphereGeometry(30, 32, 32);
+const shellMat = new THREE.MeshBasicMaterial({ 
+    color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.05 
+});
+const shell = new THREE.Mesh(shellGeo, shellMat);
+scene.add(shell);
+
+// ═══════════════════════════════════════════════════════════════
+// LORENZ ATTRACTOR MATH
+// ═══════════════════════════════════════════════════════════════
+const sigma = 10;
+const rho = 28;
+const beta = 8 / 3;
+
+let x = 0.01, y = 0, z = 0;
+let pts = [];
+let lineMesh;
+const maxPoints = 3000;
+
+function initLorenz() {
+    x = 0.01; y = 0; z = 0;
+    pts = [];
+    
+    if (lineMesh) scene.remove(lineMesh);
+
+    const geo = new THREE.BufferGeometry();
+    const mat = new THREE.LineBasicMaterial({ color: 0xa855f7, linewidth: 2 });
+    lineMesh = new THREE.Line(geo, mat);
+    scene.add(lineMesh);
+    
+    // Moving particle
+    if (!window.particle) {
+        const pGeo = new THREE.SphereGeometry(0.3, 16, 16);
+        const pMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
+        window.particle = new THREE.Mesh(pGeo, pMat);
+        scene.add(window.particle);
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ANIMATION LOOP
+// ═══════════════════════════════════════════════════════════════
+let isRunning = true;
+const dt = 0.01;
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    if (isRunning) {
+        // Euler Integration for Lorenz
+        const dx = sigma * (y - x);
+        const dy = x * (rho - z) - y;
+        const dz = x * y - beta * z;
+
+        x += dx * dt;
+        y += dy * dt;
+        z += dz * dt;
+
+        // Scale and center the coordinates (Lorenz z goes 0 to ~50)
+        const px = x;
+        const py = z - 25; // Center z
+        const pz = y;
+
+        if (pts.length < maxPoints) {
+            pts.push(new THREE.Vector3(px, py, pz));
+            
+            const positions = new Float32Array(pts.length * 3);
+            pts.forEach((p, i) => {
+                positions[i*3] = p.x;
+                positions[i*3+1] = p.y;
+                positions[i*3+2] = p.z;
+            });
+            
+            lineMesh.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            lineMesh.geometry.setDrawRange(0, pts.length);
+        } else {
+            // Shift array to create a "trail" effect
+            pts.shift();
+            pts.push(new THREE.Vector3(px, py, pz));
+            
+            const positions = new Float32Array(pts.length * 3);
+            pts.forEach((p, i) => {
+                positions[i*3] = p.x;
+                positions[i*3+1] = p.y;
+                positions[i*3+2] = p.z;
+            });
+            
+            lineMesh.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        }
+        
+        window.particle.position.set(px, py, pz);
+    }
+
+    // Rotate scene slightly for 3D effect
+    scene.rotation.y += 0.002;
+    scene.rotation.x += 0.001;
+
+    renderer.render(scene, camera);
+}
+
+function toggleSim() {
+    isRunning = !isRunning;
+    document.getElementById('btnStart').textContent = isRunning ? "⏸ إيقاف المحاكاة" : "▶ بدء المحاكاة";
+}
+
+function resetSim() {
+    initLorenz();
+    isRunning = true;
+    document.getElementById('btnStart').textContent = "⏸ إيقاف المحاكاة";
+}
+
+// Initialize and Start
+initLorenz();
+animate();
+
+window.addEventListener('resize', () => {
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+});
+</script>
+</body>
+</html>
