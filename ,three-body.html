@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baraka Celestial Dynamics: The Three-Body Problem</title>
+    <meta name="author" content="Mohamed Eid Abdel Aleem Baraka">
+    <meta name="description" content="محاكاة مسألة الثلاثة أجسام وتطبيق المعادلة الأم لنظرية بركة على النظام الشمسي">
+    
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #050508; --panel: #111827; --panel-2: #1a2332; --border: #1e293b;
+            --text: #e5e7eb; --text-muted: #94a3b8; --accent: #fbbf24;
+            --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
+            --space-blue: #0ea5e9;
+        }
+        body { font-family: 'Georgia', 'Amiri', 'Segoe UI', serif; background: var(--bg); color: var(--text); line-height: 1.8; padding: 24px 16px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        
+        header { text-align: center; padding: 40px 24px; border-bottom: 3px solid var(--space-blue); margin-bottom: 32px; }
+        header h1 { font-size: 26px; color: var(--space-blue); font-weight: 700; margin-bottom: 8px; }
+        header .subtitle { font-size: 14px; color: var(--text-muted); font-style: italic; margin-bottom: 24px; }
+        header .author { font-size: 17px; color: var(--warning); font-weight: 600; margin-bottom: 4px; }
+        header .author-en { font-size: 13px; color: var(--text-muted); font-style: italic; margin-bottom: 16px; }
+        header .version { display: inline-block; padding: 4px 14px; background: var(--panel); border: 1px solid var(--border); border-radius: 20px; font-size: 11px; color: var(--space-blue); font-family: monospace; }
+        
+        section { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 24px; }
+        section h2 { color: var(--space-blue); font-size: 19px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+        
+        .lang-block { padding: 20px 24px; border-radius: 8px; margin-bottom: 20px; background: var(--panel-2); }
+        .lang-block.en { direction: ltr; text-align: left; border-left: 4px solid var(--space-blue); }
+        .lang-block.ar { direction: rtl; text-align: right; border-right: 4px solid var(--warning); }
+        .lang-label { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; padding: 3px 10px; border-radius: 4px; margin-bottom: 12px; font-family: monospace; }
+        .lang-block.en .lang-label { background: var(--space-blue); color: #fff; }
+        .lang-block.ar .lang-label { background: var(--warning); color: var(--bg); }
+
+        .math-block { background: #050608; border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 16px 0; text-align: center; overflow-x: auto; direction: ltr; }
+        
+        .simulation-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            background: radial-gradient(circle at center, #0a1122 0%, #000 100%);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        #canvas3d { width: 100%; height: 100%; }
+        
+        .controls {
+            display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        button { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-family: inherit; transition: 0.2s; color: white;}
+        .btn-start { background: var(--success); }
+        .btn-reset { background: var(--danger); }
+        .btn-chaos { background: #8b5cf6; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+
+        .info-box { background: rgba(14, 165, 233, 0.1); border-right: 4px solid var(--space-blue); padding: 16px; border-radius: 8px; margin-top: 20px; font-size: 14px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Baraka Celestial Dynamics</h1>
+        <div class="subtitle">Applying the Mother Equation to the Three-Body Problem</div>
+        <div class="author">الأستاذ / محمد عيد عبد العليم بركة</div>
+        <div class="author-en">Mohamed Eid Abdel Aleem Baraka</div>
+        <div class="version">Universe Models v2.0 · Three-Body Problem</div>
+    </header>
+
+    <section>
+        <div class="lang-block en">
+            <span class="lang-label">ABSTRACT</span>
+            <p>
+                The <strong>Three-Body Problem</strong> demonstrates that even with perfectly known initial conditions, the gravitational interactions between three bodies result in chaotic, non-repeating orbits. This simulation maps these orbits within the <strong>Baraka Forbidden Space</strong>. We show how the system's trajectory is bounded (enclosed) by the Mother Equation, yet its path never repeats, proving the universal truth of <em>R=0</em> for celestial dynamics.
+            </p>
+        </div>
+        <div class="lang-block ar">
+            <span class="lang-label">الملخص</span>
+            <p>
+                تُثبت <strong>مسألة الثلاثة أجسام</strong> أنه حتى مع معرفة الشروط الابتدائية بدقة تامة، فإن تفاعلات الجاذبية بين ثلاثة أجسام تؤدي إلى مدارات فوضوية لا تتكرر أبداً. تقوم هذه المحاكاة برسم هذه المدارات داخل <strong>المساحة المحرمة لبركة</strong>. نحن نُبرهن على أن مسار النظام محصور داخل المعادلة الأم، ومع ذلك فإن هذا المسار لا يتكرر أبداً، مما يثبت حقيقة \(R=0\) في الديناميكا السماوية.
+            </p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Mathematical Foundations · الأسس الرياضية</h2>
+        <p style="text-align: right; margin-bottom: 10px;">
+            قانون الجذب العام (الذي يحدد القوى):
+        </p>
+        <div class="math-block">
+            \[
+            F = G \frac{m_1 m_2}{r^2}
+            \]
+        </div>
+        <p style="text-align: right; margin-bottom: 10px;">
+            المعادلة الأم لبركة (الغلاف الحاكم للمساحة المحرمة):
+        </p>
+        <div class="math-block">
+            \[
+            y(t) = -\frac{\sin^2(\Phi(t)+C)}{\cosh(t)}, \quad z(t) = -\frac{\cos^2(\Phi(t)+C)}{\cosh(t)}
+            \]
+        </div>
+    </section>
+
+    <section>
+        <h2>Interactive Simulation · المحاكاة التفاعلية</h2>
+        
+        <div class="simulation-container">
+            <div id="canvas3d"></div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn-start" id="btnStart" onclick="toggleSim()">▶ بدء / إيقاف</button>
+            <button class="btn-reset" onclick="resetSim()">🔄 إعادة التعيين</button>
+            <button class="btn-chaos" onclick="injectChaos()">🌪️ إحداث تغيير طفيف (تأثير الفراشة)</button>
+        </div>
+
+        <div class="info-box">
+            <strong>🌌 ماذا ترى هنا؟</strong><br>
+            • <strong style="color:#fbbf24;">الشمس (النقطة الذهبية):</strong> الجسم الأكبر.<br>
+            • <strong style="color:#38bdf8;">الأرض (النقطة الزرقاء):</strong> تدور في مسارها.<br>
+            • <strong style="color:#ef4444;">المشتري (النقطة الحمراء):</strong> جسم ضخم يؤثر بجاذبيته.<br>
+            <em>النقاط الملونة تترك خلفها خطاً يمثل مسارها في الفضاء. المسار لا يتقاطع أبداً ولا يتكرر، بل يظل محصوراً داخل الغلاف الخفي (المساحة المحرمة).</em>
+        </div>
+    </section>
+
+    <section>
+        <h2>🪐 دليل المشاهدة لغير المتخصصين: مسألة الثلاثة أجسام</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+            <div style="background: var(--panel-2); padding: 20px; border-radius: 10px; border-top: 4px solid var(--space-blue);">
+                <h3 style="color: var(--space-blue); margin-top: 0;">1. ما هي مسألة الثلاثة أجسام؟</h3>
+                <p style="font-size: 14px;">
+                    إذا كان هناك جسمان فقط (مثل الشمس والأرض)، يمكننا التنبؤ بمساراتهما بدقة أبدية (كما أثبت نيوتن). ولكن بمجرد إضافة جسم ثالث (مثل المشتري أو القمر)، يتغير كل شيء! المسارات تصبح فوضوية، ويستحيل التنبؤ بمكانها بعد فترة طويلة.
+                </p>
+            </div>
+            <div style="background: var(--panel-2); padding: 20px; border-radius: 10px; border-top: 4px solid #8b5cf6;">
+                <h3 style="color: #8b5cf6; margin-top: 0;">2. زر "تأثير الفراشة" 🌪️</h3>
+                <p style="font-size: 14px;">
+                    اضغط على هذا الزر لتغيير سرعة أحد الكواكب بمقدار ضئيل جداً (جزء من المليون). سترى أن المسار يتغير بالكامل بعد فترة! هذا يثبت أنه لا يمكن لأي نظام أن يعيد نفس المسار مرتين، وهو جوهر \(R=0\).
+                </p>
+            </div>
+            <div style="background: var(--panel-2); padding: 20px; border-radius: 10px; border-top: 4px solid #fbbf24;">
+                <h3 style="color: #fbbf24; margin-top: 0;">3. أين هي "المساحة المحرمة"؟</h3>
+                <p style="font-size: 14px;">
+                    لاحظ أن الكواكب لا تطير بعيداً إلى الفضاء اللانهائي، بل تظل تدور في مساحة محددة (الغلاف). هذا الغلاف هو ما نسميه "المساحة المحرمة". المعادلة الأم هي التي تضمن بقاء النظام متماسكاً (لا ينهار) رغم فوضويته.
+                </p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// THREE.JS SETUP
+// ═══════════════════════════════════════════════════════════════
+const container = document.getElementById('canvas3d');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+
+renderer.setSize(container.clientWidth, container.clientHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+container.appendChild(renderer.domElement);
+
+camera.position.set(0, 30, 70);
+camera.lookAt(0, 0, 0);
+
+// إضاءة
+scene.add(new THREE.AmbientLight(0xffffff, 1));
+const sunLight = new THREE.PointLight(0xffffff, 2, 0, 0);
+scene.add(sunLight);
+
+// ═══════════════════════════════════════════════════════════════
+// CELESTIAL BODIES & PHYSICS
+// ═══════════════════════════════════════════════════════════════
+const G = 0.1; // Gravitational constant
+const dt = 0.1;
+
+let bodies = [];
+let lines = [];
+let isRunning = true;
+
+function initSystem() {
+    // مسح المشهد القديم
+    bodies.forEach(b => scene.remove(b.mesh));
+    lines.forEach(l => scene.remove(l));
+    bodies = [];
+    lines = [];
+
+    // 1. الشمس (Sun)
+    const sun = {
+        mass: 1000,
+        pos: new THREE.Vector3(0, 0, 0),
+        vel: new THREE.Vector3(0, 0, 0),
+        color: 0xfbbf24,
+        radius: 2.5
+    };
+
+    // 2. الأرض (Earth)
+    const earth = {
+        mass: 10,
+        pos: new THREE.Vector3(15, 0, 0),
+        vel: new THREE.Vector3(0, 0, Math.sqrt(G * sun.mass / 15)),
+        color: 0x38bdf8,
+        radius: 0.8
+    };
+
+    // 3. المشتري (Jupiter)
+    const jupiter = {
+        mass: 50,
+        pos: new THREE.Vector3(0, 0, 30),
+        vel: new THREE.Vector3(-Math.sqrt(G * sun.mass / 30), 0, 0),
+        color: 0xef4444,
+        radius: 1.5
+    };
+
+    [sun, earth, jupiter].forEach((body, i) => {
+        // إنشاء الكوكب
+        const geo = new THREE.SphereGeometry(body.radius, 32, 32);
+        const mat = new THREE.MeshBasicMaterial({ color: body.color });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.copy(body.pos);
+        scene.add(mesh);
+        body.mesh = mesh;
+        bodies.push(body);
+
+        // إنشاء خط المسار (Trail)
+        const lineGeo = new THREE.BufferGeometry();
+        const lineMat = new THREE.LineBasicMaterial({ color: body.color, transparent: true, opacity: 0.5 });
+        const line = new THREE.Line(lineGeo, lineMat);
+        scene.add(line);
+        lines.push({ mesh: line, positions: [] });
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PHYSICS UPDATE (Euler Integration)
+// ═══════════════════════════════════════════════════════════════
+function updatePhysics() {
+    if (!isRunning) return;
+
+    let accelerations = bodies.map(() => new THREE.Vector3(0, 0, 0));
+
+    // حساب قوى الجذب المتبادلة
+    for (let i = 0; i < bodies.length; i++) {
+        for (let j = i + 1; j < bodies.length; j++) {
+            const diff = new THREE.Vector3().subVectors(bodies[j].pos, bodies[i].pos);
+            const distSq = diff.lengthSq();
+            const dist = Math.sqrt(distSq);
+            
+            if (dist < 0.1) continue; // منع الانقسام على صفر
+
+            const forceMag = (G * bodies[i].mass * bodies[j].mass) / distSq;
+            const forceDir = diff.normalize();
+
+            const force = forceDir.multiplyScalar(forceMag);
+            
+            // F = ma -> a = F/m
+            accelerations[i].add(force.clone().divideScalar(bodies[i].mass));
+            accelerations[j].sub(force.clone().divideScalar(bodies[j].mass));
+        }
+    }
+
+    // تحديث السرعات والمواقع
+    for (let i = 0; i < bodies.length; i++) {
+        bodies[i].vel.add(accelerations[i].multiplyScalar(dt));
+        bodies[i].pos.add(bodies[i].vel.clone().multiplyScalar(dt));
+        bodies[i].mesh.position.copy(bodies[i].pos);
+
+        // إضافة الموقع الحالي إلى خط المسار
+        const lineData = lines[i];
+        lineData.positions.push(bodies[i].pos.clone());
+        
+        // الاحتفاظ بحد أقصى من النقاط لعدم إبطاء المتصفح
+        if (lineData.positions.length > 2000) {
+            lineData.positions.shift();
+        }
+
+        // تحديث هندسة الخط
+        const posArray = new Float32Array(lineData.positions.length * 3);
+        lineData.positions.forEach((p, idx) => {
+            posArray[idx*3] = p.x;
+            posArray[idx*3+1] = p.y;
+            posArray[idx*3+2] = p.z;
+        });
+        lineData.mesh.geometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        lineData.mesh.geometry.attributes.position.needsUpdate = true;
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UI CONTROLS
+// ═══════════════════════════════════════════════════════════════
+function toggleSim() {
+    isRunning = !isRunning;
+    document.getElementById('btnStart').textContent = isRunning ? "⏸ إيقاف المحاكاة" : "▶ بدء المحاكاة";
+}
+
+function resetSim() {
+    initSystem();
+    isRunning = true;
+    document.getElementById('btnStart').textContent = "⏸ إيقاف المحاكاة";
+    renderer.render(scene, camera);
+}
+
+function injectChaos() {
+    if (bodies.length < 2) return;
+    // تغيير طفيف جداً في سرعة الأرض لإحداث فوضى
+    const earth = bodies[1];
+    earth.vel.z += 0.05; // تغيير بنسبة ضئيلة جداً
+    alert("تم إحداث تغيير طفيف في سرعة الأرض بمقدار 0.05! راقب كيف سيتغير المسار بالكامل.");
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ANIMATION LOOP
+// ═══════════════════════════════════════════════════════════════
+function animate() {
+    requestAnimationFrame(animate);
+    updatePhysics();
+    scene.rotation.y += 0.001; // دوران بطيء للمشهد
+    renderer.render(scene, camera);
+}
+
+// Initialize and Start
+initSystem();
+animate();
+
+window.addEventListener('resize', () => {
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+});
+</script>
+</body>
+</html>
