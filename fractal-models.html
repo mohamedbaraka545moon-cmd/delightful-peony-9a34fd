@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baraka Fractal Dynamics: The Infinite Boundary</title>
+    <meta name="author" content="Mohamed Eid Abdel Aleem Baraka">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #050508; --panel: #111827; --border: #1e293b;
+            --text: #e5e7eb; --text-muted: #94a3b8;
+            --accent: #fbbf24; --space-blue: #0ea5e9;
+        }
+        body { font-family: 'Georgia', 'Amiri', 'Segoe UI', serif; background: var(--bg); color: var(--text); line-height: 1.8; padding: 24px 16px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        
+        header { text-align: center; padding: 40px 24px; border-bottom: 3px solid var(--space-blue); margin-bottom: 32px; }
+        header h1 { font-size: 26px; color: var(--space-blue); font-weight: 700; margin-bottom: 8px; }
+        header .subtitle { font-size: 14px; color: var(--text-muted); font-style: italic; margin-bottom: 24px; }
+        header .author { font-size: 17px; color: var(--accent); font-weight: 600; margin-bottom: 4px; }
+        header .author-en { font-size: 13px; color: var(--text-muted); font-style: italic; margin-bottom: 16px; }
+        
+        section { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 24px; }
+        section h2 { color: var(--space-blue); font-size: 19px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+        
+        .lang-block { padding: 20px 24px; border-radius: 8px; margin-bottom: 20px; background: #1a2332; }
+        .lang-block.en { direction: ltr; text-align: left; border-left: 4px solid var(--space-blue); }
+        .lang-block.ar { direction: rtl; text-align: right; border-right: 4px solid var(--accent); }
+        
+        .simulation-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            background: #000;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 20px;
+            cursor: crosshair;
+        }
+        #fractalCanvas { width: 100%; height: 100%; display: block; }
+        
+        .controls {
+            display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        button { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-family: inherit; transition: 0.2s; color: white; background: var(--space-blue); }
+        button:hover { background: #0284c7; transform: translateY(-2px); }
+
+        .info-box { background: rgba(14, 165, 233, 0.1); border-right: 4px solid var(--space-blue); padding: 16px; border-radius: 8px; margin-top: 20px; font-size: 14px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Baraka Fractal Dynamics</h1>
+        <div class="subtitle">Applying the Mother Equation to Infinite Boundaries</div>
+        <div class="author">الأستاذ / محمد عيد عبد العليم بركة</div>
+        <div class="author-en">Mohamed Eid Abdel Aleem Baraka</div>
+    </header>
+
+    <section>
+        <div class="lang-block en">
+            <span class="lang-label">ABSTRACT</span>
+            <p>
+                The <strong>Mandelbrot Set</strong> is a mathematical fractal that exhibits self-similarity and infinite complexity. In the context of the <strong>Baraka Forbidden Space</strong>, the fractal represents the ultimate boundary of uniqueness. As you zoom into the set, the pattern repeats conceptually, yet no two regions are ever identical. This computationally proves the universal principle of <em>R=0</em> at the micro-scale.
+            </p>
+        </div>
+        <div class="lang-block ar">
+            <span class="lang-label">الملخص</span>
+            <p>
+                تُجسّد <strong>مجموعة ماندلبروت (Mandelbrot Set)</strong> التعقيد اللانهائي في الرياضيات. في سياق <strong>المساحة المحرمة لبركة</strong>، يمثل النمط الفركتلي الحد الأقصى للفرادة. كلما اقتربت (Zoom in) داخل النمط، يتكرر الشكل العام، ولكنك لن تجد تفصيلاً مطابقاً تماماً لغيره أبداً. هذا يُبرهن بصرياً وحسابياً على مبدأ <em>R=0</em> في المستوى المجهري.
+            </p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Interactive Simulation · المحاكاة التفاعلية</h2>
+        <p style="text-align: center; margin-bottom: 20px; color: var(--text-muted);">
+            (انقر على أي منطقة في الفركتل للتقريب منها ورؤية اللانهاية)
+        </p>
+        
+        <div class="simulation-container" id="canvasContainer">
+            <canvas id="fractalCanvas"></canvas>
+        </div>
+        
+        <div class="controls">
+            <button onclick="resetView()">🔄 إعادة التعيين (Reset)</button>
+        </div>
+
+        <div class="info-box">
+            <strong>🧠 لماذا هذا مهم لنظرية بركة؟</strong><br>
+            النمط الفركتلي يثبت أن "المعادلة الأم" ليست مجرد خطوط، بل هي <strong>لغة بناء</strong>. الطبيعة تستخدم الفركتلات في كل مكان (أوراق الشجر، المجرات، الأوعية الدموية). التقاط هذه البنية داخل "المساحة المحرمة" يعني أننا نستطيع وصف وتوثيق أي نمط فريد في الكون، مهما كان معقداً أو صغيراً.
+        </div>
+    </section>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// MANDELBROT SET RENDERER (High Performance)
+// ═══════════════════════════════════════════════════════════════
+const canvas = document.getElementById('fractalCanvas');
+const ctx = canvas.getContext('2d');
+
+let width, height;
+let zoom = 1;
+let offsetX = -0.5;
+let offsetY = 0;
+
+function resize() {
+    width = canvas.parentElement.clientWidth;
+    height = canvas.parentElement.clientHeight;
+    canvas.width = width;
+    canvas.height = height;
+    drawFractal();
+}
+
+// دالة حساب لون النقطة بناءً على سرعة هروبها
+function getColor(iterations, maxIterations) {
+    if (iterations === maxIterations) return [0, 0, 0]; // داخل المجموعة (أسود)
+    
+    // ألوان بركة (أزرق سماوي، ذهبي، بنفسجي)
+    let t = iterations / maxIterations;
+    let r = Math.floor(9 * (1 - t) * t * t * t * 255);
+    let g = Math.floor(15 * (1 - t) * (1 - t) * t * t * 255);
+    let b = Math.floor(8.5 * (1 - t) * (1 - t) * (1 - t) * t * 255);
+    
+    // تطعيم بالأزرق السماوي والذهبي
+    if (t < 0.5) {
+        r += 50; g += 150; b += 255; 
+    } else {
+        r += 255; g += 180; b += 50;
+    }
+    
+    return [Math.min(r, 255), Math.min(g, 255), Math.min(b, 255)];
+}
+
+function drawFractal() {
+    const maxIter = 100;
+    const imgData = ctx.createImageData(width, height);
+    
+    // نطاق الإحداثيات
+    const minX = -2.5 / zoom + offsetX;
+    const maxX = 1.5 / zoom + offsetX;
+    const minY = -1.5 / zoom + offsetY;
+    const maxY = 1.5 / zoom + offsetY;
+
+    for (let px = 0; px < width; px++) {
+        for (let py = 0; py < height; py++) {
+            // تحويل إحداثيات البكسل إلى أرقام مركبة
+            let x0 = minX + (px / width) * (maxX - minX);
+            let y0 = minY + (py / height) * (maxY - minY);
+            
+            let x = 0, y = 0, iter = 0;
+            
+            while (x*x + y*y <= 4 && iter < maxIter) {
+                let xtemp = x*x - y*y + x0;
+                y = 2*x*y + y0;
+                x = xtemp;
+                iter++;
+            }
+            
+            const [r, g, b] = getColor(iter, maxIter);
+            const index = (py * width + px) * 4;
+            imgData.data[index] = r;
+            imgData.data[index+1] = g;
+            imgData.data[index+2] = b;
+            imgData.data[index+3] = 255;
+        }
+    }
+    ctx.putImageData(imgData, 0, 0);
+}
+
+// التفاعل (النقر للتقريب)
+canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+
+    const minX = -2.5 / zoom + offsetX;
+    const maxX = 1.5 / zoom + offsetX;
+    const minY = -1.5 / zoom + offsetY;
+    const maxY = 1.5 / zoom + offsetY;
+
+    // حساب النقطة الجديدة
+    offsetX = minX + (px / width) * (maxX - minX);
+    offsetY = minY + (py / height) * (maxY - minY);
+    
+    zoom *= 2.5; // مضاعفة التقريب
+    drawFractal();
+});
+
+function resetView() {
+    zoom = 1;
+    offsetX = -0.5;
+    offsetY = 0;
+    drawFractal();
+}
+
+window.addEventListener('resize', resize);
+resize();
+</script>
+</body>
+</html>
