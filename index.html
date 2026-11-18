@@ -3,416 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baraka Analytical Theory | نظرية بركة التحليلية</title>
+    <title>نظرية بركة التحليلية | Baraka Analytical Theory</title>
     <meta name="description" content="الموقع الرسمي لنظرية بركة التحليلية - المساحة المحرمة وتطبيقاتها في التشفير والأنظمة الكونية">
     <meta name="author" content="Mohamed Eid Abdel Aleem Baraka">
-    
-    <!-- خطوط جوجل الاحترافية -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    
-    <!-- مكتبة المعادلات -->
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
-            --bg: #030712; 
-            --surface: #111827;
-            --surface-light: #1f2937;
-            --border: rgba(255, 255, 255, 0.1);
-            --text: #f3f4f6;
-            --text-muted: #9ca3af;
-            --primary: #38bdf8;
-            --gold: #fbbf24;
-            --purple: #a855f7;
-            --green: #10b981;
-            --red: #ef4444;
+            --bg: #0a0d14; --panel: #111827; --panel-2: #1a2332; --border: #1e293b;
+            --text: #e5e7eb; --text-muted: #94a3b8; --accent: #38bdf8;
+            --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
         }
+        body { font-family: 'Georgia', 'Amiri', 'Segoe UI', serif; background: var(--bg); color: var(--text); line-height: 1.8; padding: 0; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
         
-        body { 
-            font-family: 'Cairo', 'Inter', sans-serif; 
-            background: var(--bg); 
-            color: var(--text); 
-            line-height: 1.8; 
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.08), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.08), transparent 25%);
-        }
-
-        /* شريط التنقل العلوي */
-        nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background: rgba(3, 7, 18, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border);
-            z-index: 1000;
-            padding: 15px 0;
-        }
-        .nav-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-        }
-        .nav-logo {
-            font-weight: 800;
-            font-size: 20px;
-            color: var(--primary);
-            letter-spacing: 1px;
-        }
-        .nav-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            margin-right: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            transition: color 0.3s;
-        }
-        .nav-links a:hover { color: var(--primary); }
-
-        /* القسم الرئيسي (Hero) */
-        header {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 100px 20px 50px;
-            position: relative;
-        }
+        header { text-align: center; padding: 50px 24px; border-bottom: 3px solid var(--accent); margin-bottom: 40px; background: linear-gradient(180deg, #0a1122 0%, var(--bg) 100%); }
+        header h1 { font-size: 32px; color: var(--accent); font-weight: 700; margin-bottom: 10px; }
+        header .subtitle { font-size: 16px; color: var(--text-muted); font-style: italic; margin-bottom: 20px; }
+        header .author { font-size: 20px; color: var(--warning); font-weight: 600; margin-bottom: 5px; }
+        header .author-en { font-size: 14px; color: var(--text-muted); font-style: italic; }
         
-        .doi-badge {
-            display: inline-block;
-            background: rgba(251, 191, 36, 0.1);
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 30px;
-            text-decoration: none;
-            transition: all 0.3s;
-            font-family: 'Inter', monospace;
-        }
-        .doi-badge:hover {
-            background: var(--gold);
-            color: var(--bg);
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
-        }
-
-        .hero-title {
-            font-size: clamp(40px, 6vw, 70px);
-            font-weight: 800;
-            line-height: 1.2;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #fff 0%, #38bdf8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+        section { margin-bottom: 40px; }
+        h2 { color: var(--accent); font-size: 24px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--border); text-align: center; }
         
-        .hero-subtitle {
-            font-size: clamp(16px, 2vw, 22px);
-            color: var(--text-muted);
-            max-width: 800px;
-            margin-bottom: 40px;
-            font-family: 'Inter', sans-serif;
-        }
+        .lang-block { padding: 24px; border-radius: 12px; margin-bottom: 24px; background: var(--panel); border: 1px solid var(--border); }
+        .lang-block.en { direction: ltr; text-align: left; border-left: 4px solid var(--accent); }
+        .lang-block.ar { direction: rtl; text-align: right; border-right: 4px solid var(--warning); }
+        .lang-label { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; padding: 4px 12px; border-radius: 4px; margin-bottom: 15px; font-family: monospace; }
+        .lang-block.en .lang-label { background: var(--accent); color: var(--bg); }
+        .lang-block.ar .lang-label { background: var(--warning); color: var(--bg); }
         
-        .author-info {
-            font-size: 18px;
-            color: var(--gold);
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-        .author-en {
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-        }
-
-        /* قسم المعادلة */
-        .equation-container {
-            width: 100%;
-            max-width: 900px;
-            margin: 0 auto 80px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-
-        /* شبكة البطاقات */
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .math-block { background: #050608; border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center; overflow-x: auto; direction: ltr; }
         
-        .section-title {
-            font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 10px;
-            color: #fff;
-            text-align: center;
-        }
-        .section-desc {
-            text-align: center;
-            color: var(--text-muted);
-            margin-bottom: 50px;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .grid-container {
+        /* تصميم شبكة المنتجات القديم */
+        .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
-            margin-bottom: 80px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
         }
-
-        .card {
-            background: linear-gradient(180deg, rgba(31, 41, 55, 0.5) 0%, rgba(17, 24, 39, 0.8) 100%);
+        
+        .product-card {
+            background: var(--panel-2);
             border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 30px;
-            text-decoration: none;
-            color: white;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            backdrop-filter: blur(10px);
         }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 4px;
-            background: var(--primary);
-            transition: height 0.3s;
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            border-color: var(--accent);
         }
-
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            border-color: rgba(255,255,255,0.2);
-        }
-        .card:hover::before { height: 8px; }
-
-        .card-icon {
-            font-size: 40px;
-            margin-bottom: 20px;
+        
+        .product-card .tag {
             display: inline-block;
-            padding: 15px;
-            border-radius: 15px;
-            background: rgba(255,255,255,0.05);
-        }
-
-        .card h3 {
-            font-size: 22px;
-            margin-bottom: 10px;
-            font-weight: 800;
-        }
-        .card p {
-            color: var(--text-muted);
-            font-size: 15px;
-            margin-bottom: 25px;
-            flex-grow: 1;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .card-btn {
-            display: inline-block;
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-weight: 700;
-            text-align: center;
-            transition: 0.3s;
-            font-family: 'Cairo', sans-serif;
-        }
-
-        /* ألوان البطاقات */
-        .card-red::before { background: var(--red); }
-        .card-red .card-icon { color: var(--red); background: rgba(239, 68, 68, 0.1); }
-        .card-red .card-btn { background: rgba(239, 68, 68, 0.1); color: var(--red); border: 1px solid var(--red); }
-        .card-red:hover .card-btn { background: var(--red); color: #fff; }
-
-        .card-purple::before { background: var(--purple); }
-        .card-purple .card-icon { color: var(--purple); background: rgba(168, 85, 247, 0.1); }
-        .card-purple .card-btn { background: rgba(168, 85, 247, 0.1); color: var(--purple); border: 1px solid var(--purple); }
-        .card-purple:hover .card-btn { background: var(--purple); color: #fff; }
-
-        .card-blue::before { background: var(--primary); }
-        .card-blue .card-icon { color: var(--primary); background: rgba(56, 189, 248, 0.1); }
-        .card-blue .card-btn { background: rgba(56, 189, 248, 0.1); color: var(--primary); border: 1px solid var(--primary); }
-        .card-blue:hover .card-btn { background: var(--primary); color: #000; }
-
-        .card-green::before { background: var(--green); }
-        .card-green .card-icon { color: var(--green); background: rgba(16, 185, 129, 0.1); }
-        .card-green .card-btn { background: rgba(16, 185, 129, 0.1); color: var(--green); border: 1px solid var(--green); }
-        .card-green:hover .card-btn { background: var(--green); color: #fff; }
-
-        .card-gold::before { background: var(--gold); }
-        .card-gold .card-icon { color: var(--gold); background: rgba(251, 191, 36, 0.1); }
-        .card-gold .card-btn { background: rgba(251, 191, 36, 0.1); color: var(--gold); border: 1px solid var(--gold); }
-        .card-gold:hover .card-btn { background: var(--gold); color: #000; }
-
-        /* الفوتر */
-        footer {
-            border-top: 1px solid var(--border);
-            padding: 50px 20px;
-            text-align: center;
-            background: #02040a;
-        }
-        .footer-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .footer-title {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 15px;
-        }
-        .footer-text {
-            color: var(--text-muted);
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-        .footer-doi {
-            display: inline-block;
-            padding: 10px 20px;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
             background: rgba(56, 189, 248, 0.1);
-            border: 1px solid var(--primary);
-            border-radius: 8px;
-            color: var(--primary);
-            text-decoration: none;
-            font-family: monospace;
+            color: var(--accent);
+            margin-bottom: 15px;
             font-weight: bold;
         }
+        
+        .product-card h3 { font-size: 20px; color: #fff; margin-bottom: 10px; }
+        .product-card .sub { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
+        
+        .line { height: 2px; background: var(--border); margin: 20px 0; }
 
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .hero-title { font-size: 36px; }
-            .equation-container { padding: 20px; }
-        }
+        footer { text-align: center; padding: 30px; color: var(--text-muted); font-size: 14px; border-top: 1px solid var(--border); margin-top: 50px; }
+        
+        .doi-footer { margin-top: 15px; }
+        .doi-footer a { color: var(--warning); font-family: monospace; text-decoration: none; font-weight: bold; }
+        .doi-footer a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 
-    <!-- شريط التنقل -->
-    <nav>
-        <div class="nav-content">
-            <div class="nav-logo">BARAKA THEORY</div>
-            <div class="nav-links">
-                <a href="#abstract">الملخص</a>
-                <a href="#systems">الأنظمة</a>
-                <a href="#simulations">المحاكاة الكونية</a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- القسم الرئيسي -->
     <header>
-        <a href="https://doi.org/10.5281/zenodo.24295786" target="_blank" class="doi-badge">
-            Official DOI: 10.5281/zenodo.24295786
-        </a>
-        <h1 class="hero-title">نظرية بركة التحليلية</h1>
-        <p class="hero-subtitle">The Baraka Analytical Theory: A Unified Topological Framework for Prime Number Cryptography and Chaotic Dynamics</p>
-        
-        <div class="author-info">الأستاذ / محمد عيد عبد العليم بركة</div>
-        <div class="author-en">PROF. MOHAMED EID ABDEL ALEEM BARAKA</div>
+        <h1>نظرية بركة التحليلية</h1>
+        <div class="subtitle">Baraka Analytical Theory — The Forbidden Space Framework</div>
+        <div class="author">الأستاذ / محمد عيد عبد العليم بركة</div>
+        <div class="author-en">Mohamed Eid Abdel Aleem Baraka</div>
     </header>
 
     <div class="container">
-        <!-- المعادلة الأم -->
-        <div class="equation-container">
-            <h2 style="color: var(--gold); margin-bottom: 20px; font-size: 24px;">المعادلة الأم (The Mother Equation)</h2>
-            <div style="overflow-x: auto; direction: ltr;">
+        
+        <section>
+            <h2>المعادلة الأم (The Mother Equation)</h2>
+            <div class="math-block">
                 \[
                 y(t) = -\frac{\sin^2(\Phi(t)+C)}{\cosh(t)}, \quad z(t) = -\frac{\cos^2(\Phi(t)+C)}{\cosh(t)}
                 \]
             </div>
-            <p style="margin-top: 20px; color: var(--text-muted); font-size: 14px; font-family: 'Inter', sans-serif;">
-                The fundamental basis of the Forbidden Space framework, where \(C\) dictates the unique, non-repeating trajectory.
-            </p>
-        </div>
+        </section>
 
-        <!-- قسم الأنظمة -->
-        <div id="systems">
-            <h2 class="section-title">🔐 الأنظمة السيادية (Sovereign Systems)</h2>
-            <p class="section-desc">أنظمة تشفير متقدمة تعتمد على البصمة الرياضية الأولية والمساحة المحرمة</p>
-            
-            <div class="grid-container">
-                <!-- BFSP -->
-                <a href="bfsp.html" class="card card-red">
-                    <span class="card-icon">🛡️</span>
-                    <h3>بروتوكول المساحة المحرمة (BFSP)</h3>
-                    <p>نظام تشفير ديناميكي متحرك يعتمد على الأنظمة التفاضلية. يستحيل كسره بالقوة العمياء.</p>
-                    <span class="card-btn">جرب الآن ←</span>
-                </a>
-
-                <!-- PFE 1.0 -->
-                <a href="pfe-v1.html" class="card card-green">
-                    <span class="card-icon">📦</span>
-                    <h3>PFE 1.0 (النواة)</h3>
-                    <p>النظام الأساسي — تشفير الملفات باستخدام البصمة الرياضية الأولية ومعامل تكرار يساوي صفر.</p>
-                    <span class="card-btn">جرب الآن ←</span>
-                </a>
-
-                <!-- PFE Pro -->
-                <a href="pfe-pro.html" class="card card-gold">
-                    <span class="card-icon">👑</span>
-                    <h3>PFE Pro (الاحترافي)</h3>
-                    <p>القفل الزمني، التوقيع الرقمي، والتحقق الرياضي لحماية البيانات فائقة الحساسية.</p>
-                    <span class="card-btn">جرب الآن ←</span>
-                </a>
+        <section>
+            <div class="lang-block en">
+                <span class="lang-label">ABSTRACT</span>
+                <p>
+                    The <strong>Baraka Analytical Theory</strong> introduces a unified mathematical framework bridging the gaps between prime numbers, chaotic dynamics, and cryptography. By utilizing the <em>Forbidden Space</em>—a continuous 3D dynamical envelope governed by an integration constant—we demonstrate that every unique event in the universe follows a non-repeating trajectory (<em>R=0</em>).
+                </p>
             </div>
-        </div>
-
-        <!-- قسم المحاكاة الكونية -->
-        <div id="simulations">
-            <h2 class="section-title">🌌 مختبر الأنظمة الكونية (Cosmic Lab)</h2>
-            <p class="section-desc">تطبيق المعادلة الأم على الأنظمة الفوضوية لإثبات مبدأ عدم التكرار (R=0)</p>
-
-            <div class="grid-container">
-                <!-- Lorenz -->
-                <a href="universe-models.html" class="card card-purple">
-                    <span class="card-icon">🦋</span>
-                    <h3>تأثير الفراشة (Lorenz Attractor)</h3>
-                    <p>محاكاة ثلاثية الأبعاد للنظام الفوضوي. يثبت أن الحالات المتقاربة تتباعد ولا تتكرر أبداً.</p>
-                    <span class="card-btn">دخول المختبر ←</span>
-                </a>
-
-                <!-- Three-Body -->
-                <a href="three-body.html" class="card card-blue">
-                    <span class="card-icon">🪐</span>
-                    <h3>مسألة الثلاثة أجسام (Three-Body)</h3>
-                    <p>تطبيق المعادلة على الديناميكا السماوية. شاهد كيف تحكم المساحة المحرمة استقرار الكواكب.</p>
-                    <span class="card-btn">دخول المختبر ←</span>
-                </a>
+            <div class="lang-block ar">
+                <span class="lang-label">الملخص</span>
+                <p>
+                    تُقدّم <strong>نظرية بركة التحليلية</strong> إطاراً رياضياً موحداً يربط بين الأعداد الأولية، والأنظمة الفوضوية، والتشفير. من خلال استخدام <em>المساحة المحرمة</em> (غلاف ديناميكي ثلاثي الأبعاد يحدده ثابت التكامل)، نُبرهن على أن كل حدث فريد في الكون يتبع مساراً لا يتكرر أبداً (<em>R=0</em>).
+                </p>
             </div>
-        </div>
+        </section>
+
+        <section id="products">
+            <h2>منتجاتنا</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 10px;">ثلاثة أنظمة متكاملة لتشفير البيانات السيادية ومحاكاة الأنظمة الكونية</p>
+            <div class="line"></div>
+
+            <div class="products-grid">
+                <!-- 1. PFE 1.0 -->
+                <div class="product-card">
+                    <span class="tag">الإصدار الأول</span>
+                    <h3>PFE 1.0</h3>
+                    <p class="sub">الأساس الرياضي لتشفير البصمة الأولية</p>
+                    <a href="pfe-v1.html" style="display:inline-block; margin-top:15px; padding:10px 20px; background:#10b981; color:#fff; text-decoration:none; border-radius:5px; font-weight:bold;">جرب الآن</a>
+                </div>
+
+                <!-- 2. PFE Pro -->
+                <div class="product-card">
+                    <span class="tag">النسخة الاحترافية</span>
+                    <h3>PFE Pro</h3>
+                    <p class="sub">القفل الزمني والتوقيع الرقمي</p>
+                    <a href="pfe-pro.html" style="display:inline-block; margin-top:15px; padding:10px 20px; background:#f59e0b; color:#000; text-decoration:none; border-radius:5px; font-weight:bold;">جرب الآن</a>
+                </div>
+
+                <!-- 3. BFSP -->
+                <div class="product-card">
+                    <span class="tag">تشفير سيادي</span>
+                    <h3>BFSP</h3>
+                    <p class="sub">بروتوكول المساحة المحرمة الديناميكي</p>
+                    <a href="bfsp.html" style="display:inline-block; margin-top:15px; padding:10px 20px; background:#38bdf8; color:#000; text-decoration:none; border-radius:5px; font-weight:bold;">جرب الآن</a>
+                </div>
+
+                <!-- 4. Lorenz -->
+                <div class="product-card">
+                    <span class="tag">محاكاة فوضوية</span>
+                    <h3>Lorenz</h3>
+                    <p class="sub">تأثير الفراشة وإثبات R=0</p>
+                    <a href="universe-models.html" style="display:inline-block; margin-top:15px; padding:10px 20px; background:#a855f7; color:#fff; text-decoration:none; border-radius:5px; font-weight:bold;">جرب الآن</a>
+                </div>
+
+                <!-- 5. Three-Body -->
+                <div class="product-card">
+                    <span class="tag">ديناميكا سماوية</span>
+                    <h3>Three-Body</h3>
+                    <p class="sub">مسألة الثلاثة أجسام في المساحة المحرمة</p>
+                    <a href="three-body.html" style="display:inline-block; margin-top:15px; padding:10px 20px; background:#0ea5e9; color:#fff; text-decoration:none; border-radius:5px; font-weight:bold;">جرب الآن</a>
+                </div>
+            </div>
+        </section>
+
     </div>
 
-    <!-- الفوتر -->
     <footer>
-        <div class="footer-content">
-            <div class="footer-title">Baraka Analytical Theory</div>
-            <p class="footer-text">© 2026 Prof. Mohamed Eid Abdel Aleem Baraka. All Rights Reserved.</p>
-            <a href="https://doi.org/10.5281/zenodo.24295786" target="_blank" class="footer-doi">
-                DOI: 10.5281/zenodo.24295786
-            </a>
+        <p>© 2026 الأستاذ / محمد عيد عبد العليم بركة. جميع الحقوق محفوظة.</p>
+        <p>Baraka Forbidden Space Protocol (BFSP)</p>
+        <div class="doi-footer">
+            <p>Official DOI: <a href="https://doi.org/10.5281/zenodo.24295786" target="_blank">10.5281/zenodo.24295786</a></p>
         </div>
     </footer>
 
