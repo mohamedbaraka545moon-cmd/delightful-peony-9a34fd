@@ -992,6 +992,313 @@ console.log('%c𓂀 ⚔️ 🐉 بركة والتنين الصيني','font-size
         let losslessCount = 0;
         let sampleLogs = [];
 
+<!-- بداية وحدة مختبر DNA المدمجة (معزولة تماماً عن تنسيقات موقعك) -->
+<script src="https://cloudflare.com"></script>
+<script src="https://jsdelivr.net"></script>
+
+<style>
+  /* عدّل هذه المتغيرات الأربعة فقط لتطابق ألوان موقعك الحالي */
+  #bzis-dna-embed {
+    --bzis-bg: #0f172a;          /* لون خلفية البطاقة الرئيسية (اجعله transparent ليأخذ لون موقعك) */
+    --bzis-surface: #020617;     /* لون خلفية الحقول وشاشة النتائج */
+    --bzis-primary: #0284c7;     /* اللون الأساسي لموقعك (الأزرار والعناوين) */
+    --bzis-accent: #10b981;      /* اللون الثانوي (مؤشرات النجاح والتوازن) */
+    --bzis-text: #f8fafc;        /* لون النصوص الأساسية */
+    --bzis-muted: #94a3b8;       /* لون النصوص الفرعية */
+    --bzis-border: rgba(148, 163, 184, 0.22);
+
+    max-width: 1040px;
+    margin: 32px auto;
+    padding: 24px;
+    background: var(--bzis-bg);
+    border: 1px solid var(--bzis-border);
+    border-radius: 18px;
+    color: var(--bzis-text);
+    font-family: inherit; /* يرث خط موقعك تلقائياً */
+    direction: rtl;
+    text-align: right;
+    box-sizing: border-box;
+  }
+
+  /* وضع المظهر الفاتح التلقائي إذا كان موقعك ذا خلفية بيضاء */
+  #bzis-dna-embed.bzis-light-mode {
+    --bzis-bg: #ffffff;
+    --bzis-surface: #f8fafc;
+    --bzis-text: #0f172a;
+    --bzis-muted: #475569;
+    --bzis-border: #cbd5e1;
+  }
+
+  #bzis-dna-embed *, #bzis-dna-embed *::before, #bzis-dna-embed *::after {
+    box-sizing: border-box;
+  }
+
+  #bzis-dna-embed .bzis-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+    border-bottom: 1px solid var(--bzis-border);
+    padding-bottom: 16px;
+    margin-bottom: 18px;
+  }
+
+  #bzis-dna-embed .bzis-title {
+    margin: 0;
+    font-size: 22px;
+    color: var(--bzis-primary);
+  }
+
+  #bzis-dna-embed .bzis-theme-toggle {
+    background: var(--bzis-surface);
+    color: var(--bzis-text);
+    border: 1px solid var(--bzis-border);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  #bzis-dna-embed .bzis-formula {
+    background: var(--bzis-surface);
+    border: 1px solid var(--bzis-border);
+    border-left: 4px solid var(--bzis-primary);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-family: monospace;
+    color: var(--bzis-primary);
+    direction: ltr;
+    text-align: left;
+    font-size: 13px;
+    margin-bottom: 18px;
+    overflow-x: auto;
+  }
+
+  #bzis-dna-embed .bzis-stage {
+    position: relative;
+    width: 100%;
+    height: 380px;
+    background: var(--bzis-surface);
+    border: 1px solid var(--bzis-border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+
+  #bzis-dna-embed .bzis-hud {
+    position: absolute;
+    top: 12px; left: 12px; right: 12px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    pointer-events: none;
+    z-index: 5;
+    font-family: monospace;
+    font-size: 11px;
+  }
+
+  #bzis-dna-embed .bzis-pill {
+    background: var(--bzis-bg);
+    border: 1px solid var(--bzis-border);
+    padding: 6px 12px;
+    border-radius: 8px;
+    opacity: 0.92;
+  }
+
+  #bzis-dna-embed .bzis-legend {
+    position: absolute;
+    bottom: 10px; left: 12px; right: 12px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    background: var(--bzis-bg);
+    border: 1px solid var(--bzis-border);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 11px;
+    opacity: 0.92;
+  }
+
+  #bzis-dna-embed .bzis-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin-top: 12px;
+  }
+
+  #bzis-dna-embed label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bzis-text);
+  }
+
+  #bzis-dna-embed textarea,
+  #bzis-dna-embed input[type="number"] {
+    width: 100%;
+    background: var(--bzis-surface);
+    border: 1px solid var(--bzis-border);
+    color: var(--bzis-text);
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 13px;
+  }
+
+  #bzis-dna-embed input[type="range"] {
+    width: 100%;
+    accent-color: var(--bzis-primary);
+    cursor: pointer;
+  }
+
+  #bzis-dna-embed .bzis-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  #bzis-dna-embed .bzis-btn {
+    flex: 1;
+    min-width: 170px;
+    padding: 11px 14px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    color: #ffffff;
+    font-family: inherit;
+    transition: opacity 0.2s;
+  }
+
+  #bzis-dna-embed .bzis-btn:hover { opacity: 0.9; }
+  #bzis-dna-embed .bzis-btn-primary { background: var(--bzis-primary); }
+  #bzis-dna-embed .bzis-btn-accent { background: var(--bzis-accent); }
+  #bzis-dna-embed .bzis-btn-outline {
+    background: transparent;
+    border: 1px solid var(--bzis-border);
+    color: var(--bzis-text);
+  }
+
+  #bzis-dna-embed .bzis-console {
+    margin-top: 16px;
+    background: var(--bzis-surface);
+    border: 1px solid var(--bzis-border);
+    border-radius: 10px;
+    padding: 14px;
+    font-family: monospace;
+    font-size: 12.5px;
+    direction: ltr;
+    text-align: left;
+    word-break: break-all;
+  }
+</style>
+
+<section id="bzis-dna-embed">
+  <div class="bzis-header">
+    <div>
+      <h2 class="bzis-title">🧬 مختبر المعادلة الضمنية الأم على الحمض النووي (DNA)</h2>
+      <p style="margin: 6px 0 0; font-size: 13.5px; color: var(--bzis-muted);">
+        تحويل القواعد الجينية (A, C, G, T) إلى مسارات ديناميكية ثلاثية الأبعاد لمنع التكرار المتتالي وتحقيق <strong style="color: var(--bzis-accent);">R = 0</strong>.
+      </p>
+    </div>
+    <button type="button" class="bzis-theme-toggle" onclick="document.getElementById('bzis-dna-embed').classList.toggle('bzis-light-mode')">
+      🌓 تبديل المظهر (داكن / فاتح)
+    </button>
+  </div>
+
+  <div class="bzis-formula">
+    F(x, y, z, t) = sin(p_n · x + φ_i) + cos(p_n · y + t) + sin(p_n · z - t²) = 0
+  </div>
+
+  <div class="bzis-stage">
+    <div class="bzis-hud">
+      <div class="bzis-pill">
+        <strong style="color: var(--bzis-primary);">● 3D IMPLICIT DNA MANIFOLD</strong>
+        <div style="color: var(--bzis-muted); font-size: 10px;">Drag: Rotate 360° • Scroll: Zoom</div>
+      </div>
+      <div class="bzis-pill" style="text-align: center;">
+        <div style="color: var(--bzis-muted); font-size: 10px;">REPETITION COEFF</div>
+        <strong id="bzisHudR" style="color: var(--bzis-accent); font-size: 14px;">R = 0.0000</strong>
+      </div>
+    </div>
+
+    <div id="bzisDnaCanvas" style="width: 100%; height: 100%;"></div>
+
+    <div class="bzis-legend">
+      <div>
+        <span style="color:#38bdf8;">● A</span> &nbsp;|&nbsp;
+        <span style="color:#10b981;">● C</span> &nbsp;|&nbsp;
+        <span style="color:#f59e0b;">● G</span> &nbsp;|&nbsp;
+        <span style="color:#f43f5e;">● T</span>
+      </div>
+      <div style="color: var(--bzis-muted);">BARAKA-3D Zero Identity Shield (BZIS)</div>
+    </div>
+  </div>
+
+  <div>
+    <label for="bzisSeqBox">التسلسل الجيني للاختبار والتجسيد (A, C, G, T):</label>
+    <textarea id="bzisSeqBox" rows="2" dir="ltr" oninput="bzisUpdate3D()">AAAAATTTTTCCCCCGGGGGATCGATCGATCGAAAAATTTTTCCCCCGGGGGATCGATCG</textarea>
+
+    <div class="bzis-grid">
+      <div>
+        <label>المتغير الزمني الحي <span id="bzisTLabel" style="color: var(--bzis-primary); font-family: monospace;">(t = 17.4291)</span>:</label>
+        <input type="range" id="bzisTSlider" min="1.0" max="50.0" step="0.0001" value="17.4291" oninput="bzisSyncT(this.value)">
+        <input type="number" id="bzisTNum" value="17.4291" step="0.0001" dir="ltr" style="margin-top: 6px;" oninput="bzisSyncT(this.value)">
+      </div>
+      <div>
+        <label for="bzisSeedNum">مفتاح التهيئة الفضائي (Seed Key):</label>
+        <input type="number" id="bzisSeedNum" value="42" dir="ltr" oninput="bzisUpdate3D()">
+      </div>
+    </div>
+
+    <div class="bzis-actions">
+      <button type="button" class="bzis-btn bzis-btn-primary" onclick="bzisEncodeDNA()">⚡ تشفير وتحديث 3D</button>
+      <button type="button" class="bzis-btn bzis-btn-accent" onclick="bzisDecodeDNA()">🔄 عكس المعادلة (استعادة الأصل)</button>
+      <button type="button" class="bzis-btn bzis-btn-outline" onclick="bzisRunBenchmark()">🧪 محاكاة 1,000 DNA + الرسم البياني</button>
+    </div>
+
+    <div class="bzis-console" id="bzisOutConsole">
+      <span style="color: var(--bzis-muted);">Ready: Move slider (t) or click "محاكاة 1,000 DNA" to inspect equilibrium...</span>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  const PRIMES = "2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97".split(",").map(Number);
+  const BASES = "A,C,G,T".split(",");
+  const B2N = new Map([["A", 0], ["C", 1], ["G", 2], ["T", 3]]);
+  const COLORS = new Map([["A", 0x38bdf8], ["C", 0x10b981], ["G", 0xf59e0b], ["T", 0xf43f5e]]);
+
+  let scene, camera, renderer, controls, group;
+
+  function transform(seq, t, seed) {
+    let x = Math.sin(t + seed), y = Math.cos(t * 1.6180339), z = Math.sin(t * 2.7182818);
+    let out = "", pts = [];
+    for (let i = 0; i < seq.length; i++) {
+      const b = B2N.get(seq.charAt(i));
+      if (b === undefined) continue;
+      const pn = PRIMES[i % PRIMES.length];
+      const phi = (Math.PI / 2) * b;
+      x = (x + Math.sin(pn * y + t + phi) * 0.137) % (2 * Math.PI);
+      y = (y + Math.cos(pn * z - t) * 0.137) % (2 * Math.PI);
+      z = (z + Math.sin(pn * x + t * t) * 0.137) % (2 * Math.PI);
+      const shift = Math.floor(Math.abs((x + y + z) * 1e5) * pn) % 4;
+      const nb = BASES[(b + shift) % 4];
+      out += nb;
+      pts.push({ x: Math.cos(x) * 4.2, y: Math.sin(y) * 3.2, z: Math.cos(z) * 4.2, base: nb });
+    }
+    return { encoded: out, pts };
+  }
+
+  function invert(enc, t, seed) {
 
 </body>
 </html>إضافة قسم تجربة تشفير الملفات السيادية — PFE Pro
