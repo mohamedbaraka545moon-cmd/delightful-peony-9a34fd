@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baraka Unified Cosmic Engine</title>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #030508; --panel: #0a0f18; --border: #1e293b;
+            --text: #e5e7eb; --text-muted: #94a3b8;
+            --prime: #38bdf8; --chaos: #a855f7; --human: #fbbf24;
+        }
+        body { font-family: 'Georgia', 'Amiri', 'Segoe UI', serif; background: var(--bg); color: var(--text); line-height: 1.8; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        
+        /* شريط التحكم العلوي */
+        .control-bar {
+            background: var(--panel);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        .logo { font-size: 20px; font-weight: bold; color: var(--text); letter-spacing: 1px; }
+        
+        .mode-selector { display: flex; gap: 10px; }
+        .mode-btn {
+            padding: 10px 20px; border: 1px solid var(--border); border-radius: 8px;
+            background: transparent; color: var(--text-muted); font-family: inherit; font-weight: bold;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .mode-btn:hover { color: var(--text); }
+        .mode-btn.active[data-mode="prime"] { background: rgba(56, 189, 248, 0.1); border-color: var(--prime); color: var(--prime); box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); }
+        .mode-btn.active[data-mode="chaos"] { background: rgba(168, 85, 247, 0.1); border-color: var(--chaos); color: var(--chaos); box-shadow: 0 0 15px rgba(168, 85, 247, 0.3); }
+        .mode-btn.active[data-mode="human"] { background: rgba(251, 191, 36, 0.1); border-color: var(--human); color: var(--human); box-shadow: 0 0 15px rgba(251, 191, 36, 0.3); }
+
+        /* مساحة المحاكاة */
+        .simulation-area {
+            flex-grow: 1;
+            position: relative;
+            background: radial-gradient(circle at center, #0a1122 0%, #000 100%);
+        }
+        #canvas3d { width: 100%; height: 100%; display: block; }
+
+        /* لوحة المعلومات الجانبية */
+        .info-panel {
+            position: absolute;
+            top: 20px; right: 20px;
+            width: 350px;
+            background: rgba(10, 15, 24, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            z-index: 10;
+            transition: border-color 0.3s;
+        }
+        
+        .info-panel h2 { font-size: 20px; margin-bottom: 10px; transition: color 0.3s; }
+        .info-panel p { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
+        
+        .equation-box {
+            background: #000; border: 1px solid var(--border);
+            border-radius: 8px; padding: 15px; text-align: center; direction: ltr;
+            margin-bottom: 20px; overflow-x: auto;
+        }
+        
+        .control-group { margin-bottom: 15px; }
+        .control-group label { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+        .control-group input[type="range"] { width: 100%; accent-color: var(--text); }
+        
+        .status-badge {
+            display: inline-block; padding: 4px 10px; border-radius: 20px;
+            font-size: 12px; font-weight: bold; margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .control-bar { flex-direction: column; gap: 15px; padding: 15px; }
+            .info-panel { position: relative; top: 0; right: 0; width: 100%; border-radius: 0; border-bottom: 1px solid var(--border); }
+            .simulation-area { height: 60vh; }
+            body { overflow: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- شريط التحكم العلوي -->
+    <div class="control-bar">
+        <div class="logo">🌌 BARAKA UNIFIED ENGINE</div>
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="prime" onclick="switchMode('prime')">نظرية الأعداد</button>
+            <button class="mode-btn" data-mode="chaos" onclick="switchMode('chaos')">الفوضى (لورينز)</button>
+            <button class="mode-btn" data-mode="human" onclick="switchMode('human')">الطبيعة البشرية</button>
+        </div>
+    </div>
+
+    <!-- مساحة المحاكاة -->
+    <div class="simulation-area">
+        <div id="canvas3d"></div>
+        
+        <!-- لوحة المعلومات -->
+        <div class="info-panel" id="infoPanel">
+            <div class="status-badge" id="statusBadge" style="background: rgba(56,189,248,0.1); color: var(--prime);">النظام الحالي: الأعداد الأولية</div>
+            <h2 id="panelTitle" style="color: var(--prime);">The Prime System</h2>
+            <p id="panelDesc">المعادلة الأم ترسم مساراً حتمياً. عند الأعداد الأولية، تلامس النقاط الصفر (y=0) مما يثبت مبرهنة ويلسون.</p>
+            
+            <div class="equation-box">
+                \[
+                y(t) = -\frac{\sin^2(\Phi(t)+C)}{\cosh(t)}
+                \]
+            </div>
+
+            <div class="control-group">
+                <label>ثابت التكامل (C): <span id="cVal" style="color: var(--text);">0.00</span></label>
+                <input type="range" id="cSlider" min="0" max="6.28" step="0.01" value="0">
+            </div>
+            
+            <div class="control-group">
+                <label>الزمن / التطور (t): <span id="tVal" style="color: var(--text);">10.0</span></label>
+                <input type="range" id="tSlider" min="1" max="50" step="0.5" value="10">
+            </div>
+        </div>
+    </div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// SETUP THREE.JS
+// ═══════════════════════════════════════════════════════════════
+const container = document.getElementById('canvas3d');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+
+renderer.setSize(container.clientWidth, container.clientHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+container.appendChild(renderer.domElement);
+
+camera.position.set(0, 15, 50);
+camera.lookAt(0, 0, 0);
+
+// إضاءة
+scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
+dirLight.position.set(10, 20, 10);
+scene.add(dirLight);
+
+// شبكة خلفية
+const grid = new THREE.GridHelper(80, 40, 0x1e293b, 0x1e293b);
+grid.position.y = -10;
+scene.add(grid);
+
+// ═══════════════════════════════════════════════════════════════
+// MATHEMATICAL CORE (Mother Equation)
+// ═══════════════════════════════════════════════════════════════
+function gamma(x) {
+    if (x < 0.5) return Math.PI / (Math.sin(Math.PI * x) * gamma(1 - x));
+    const g = 7;
+    const C = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+    x -= 1;
+    let a = C[0];
+    const t = x + g + 0.5;
+    for (let i = 1; i < g + 2; i++) a += C[i] / (x + i);
+    return Math.sqrt(2 * Math.PI) * Math.pow(t, x + 0.5) * Math.exp(-t) * a;
+}
+
+function getMotherCoordinates(t, C) {
+    let phi = Math.PI * (gamma(t) + 1) / t + C;
+    let cosh_t = Math.cosh(Math.min(t, 700));
+    let y = -Math.pow(Math.sin(phi), 2) / cosh_t;
+    let z = -Math.pow(Math.cos(phi), 2) / cosh_t;
+    return { y: y, z: z };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ENGINE STATE & VISUALS
+// ═══════════════════════════════════════════════════════════════
+let currentMode = 'prime';
+let C = 0;
+let maxT = 10;
+let meshGroup = new THREE.Group();
+scene.add(meshGroup);
+
+function clearScene() {
+    while(meshGroup.children.length > 0){ 
+        meshGroup.remove(meshGroup.children[0]); 
+    }
+}
+
+function buildMode() {
+    clearScene();
+    
+    if (currentMode === 'prime') buildPrimeMode();
+    else if (currentMode === 'chaos') buildChaosMode();
+    else if (currentMode === 'human') buildHumanMode();
+}
+
+// 1. نمط الأعداد الأولية (Prime Mode)
+function buildPrimeMode() {
+    const points = [];
+    const scale = 25;
+    for (let t = 1.01; t <= maxT; t += 0.05) {
+        const coords = getMotherCoordinates(t, C);
+        points.push(new THREE.Vector3(t * 1.5 - (maxT*0.75), coords.y * scale, coords.z * scale));
+    }
+    
+    const geo = new THREE.BufferGeometry().setFromPoints(points);
+    const mat = new THREE.LineBasicMaterial({ color: 0x38bdf8, linewidth: 2 });
+    meshGroup.add(new THREE.Line(geo, mat));
+    
+    // نقاط الأعداد الأولية
+    for (let n = 2; n <= maxT; n++) {
+        if (isPrime(n)) {
+            const c = getMotherCoordinates(n, C);
+            const dot = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 16), new THREE.MeshBasicMaterial({ color: 0xfbbf24 }));
+            dot.position.set(n * 1.5 - (maxT*0.75), c.y * scale, c.z * scale);
+            meshGroup.add(dot);
+        }
+    }
+}
+
+// 2. نمط الفوضى لورينز (Chaos Mode)
+function buildChaosMode() {
+    // محاكاة لورينز بأخذ مسارها وضغطه داخل المعادلة الأم
+    let x=0.1, y=0, z=0, dt=0.01, sigma=10, rho=28, beta=8/3;
+    const points = [];
+    const scale = 1.5;
+    
+    for(let i=0; i<3000; i++) {
+        let dx = sigma * (y - x);
+        let dy = x * (rho - z) - y;
+        let dz = x * y - beta * z;
+        x += dx * dt; y += dy * dt; z += dz * dt;
+        
+        // نستخدم المعادلة الأم لتوليد الألوان والإحداثيات
+        const coords = getMotherCoordinates(Math.abs(x)+1, C);
+        points.push(new THREE.Vector3(x*scale, (z-25)*scale, y*scale + coords.y*10));
+    }
+    
+    const geo = new THREE.BufferGeometry().setFromPoints(points);
+    const mat = new THREE.LineBasicMaterial({ color: 0xa855f7, transparent: true, opacity: 0.8 });
+    meshGroup.add(new THREE.Line(geo, mat));
+}
+
+// 3. نمط الطبيعة البشرية (Human Mode)
+function buildHumanMode() {
+    const pointsY = []; // الظاهر
+    const pointsZ = []; // الباطن
+    const scale = 20;
+    
+    for (let t = 1; t <= maxT; t += 0.1) {
+        const coords = getMotherCoordinates(t, C);
+        const xPos = t * 1.5 - (maxT*0.75);
+        pointsY.push(new THREE.Vector3(xPos, coords.y * scale, 0));
+        pointsZ.push(new THREE.Vector3(xPos, coords.z * scale, 0));
+    }
+    
+    // خط الأفعال الظاهرة (أزرق)
+    const geoY = new THREE.BufferGeometry().setFromPoints(pointsY);
+    meshGroup.add(new THREE.Line(geoY, new THREE.LineBasicMaterial({ color: 0x38bdf8, linewidth: 2 })));
+    
+    // خط الدوافع الباطنة (بنفسجي)
+    const geoZ = new THREE.BufferGeometry().setFromPoints(pointsZ);
+    meshGroup.add(new THREE.Line(geoZ, new THREE.LineBasicMaterial({ color: 0xa855f7, linewidth: 2 })));
+}
+
+function isPrime(num) {
+    for(let i = 2, s = Math.sqrt(num); i <= s; i++) {
+        if(num % i === 0) return false;
+    }
+    return num > 1;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UI INTERACTION
+// ═══════════════════════════════════════════════════════════════
+function switchMode(mode) {
+    currentMode = mode;
+    
+    // تحديث الأزرار
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
+    
+    // تحديث النصوص والألوان
+    const title = document.getElementById('panelTitle');
+    const desc = document.getElementById('panelDesc');
+    const badge = document.getElementById('statusBadge');
+    const panel = document.getElementById('infoPanel');
+    
+    if (mode === 'prime') {
+        title.textContent = "The Prime System";
+        title.style.color = "var(--prime)";
+        desc.textContent = "المعادلة الأم ترسم مساراً حتمياً. عند الأعداد الأولية، تلامس النقاط الصفر (y=0) مما يثبت مبرهنة ويلسون.";
+        badge.style.color = "var(--prime)";
+        badge.style.background = "rgba(56,189,248,0.1)";
+        badge.textContent = "النظام الحالي: الأعداد الأولية";
+        panel.style.borderColor = "rgba(56,189,248,0.3)";
+    } else if (mode === 'chaos') {
+        title.textContent = "The Chaotic Attractor";
+        title.style.color = "var(--chaos)";
+        desc.textContent = "تطبيق المعادلة على أنظمة الفوضى (لورينز). تثبت أن المسار لا يتقاطع مع نفسه أبداً مما يثبت R=0.";
+        badge.style.color = "var(--chaos)";
+        badge.style.background = "rgba(168,85,247,0.1)";
+        badge.textContent = "النظام الحالي: الأنظمة الفوضوية";
+        panel.style.borderColor = "rgba(168,85,247,0.3)";
+    } else if (mode === 'human') {
+        title.textContent = "Human Nature";
+        title.style.color = "var(--human)";
+        desc.textContent = "تطبيق المعادلة على النفس البشرية. الأزرق يمثل الأفعال الظاهرة، والبنفسجي يمثل الدوافع الخفية. الهوية الفريدة (C) تثبت أن كل إنسان لا يتكرر.";
+        badge.style.color = "var(--human)";
+        badge.style.background = "rgba(251,191,36,0.1)";
+        badge.textContent = "النظام الحالي: الطبيعة البشرية";
+        panel.style.borderColor = "rgba(251,191,36,0.3)";
+    }
+    
+    buildMode();
+}
+
+// مستمعات الأحداث
+document.getElementById('cSlider').addEventListener('input', (e) => {
+    C = parseFloat(e.target.value);
+    document.getElementById('cVal').textContent = C.toFixed(2);
+    buildMode();
+});
+
+document.getElementById('tSlider').addEventListener('input', (e) => {
+    maxT = parseFloat(e.target.value);
+    document.getElementById('tVal').textContent = maxT.toFixed(1);
+    buildMode();
+});
+
+// ═══════════════════════════════════════════════════════════════
+// ANIMATION LOOP
+// ═══════════════════════════════════════════════════════════════
+function animate() {
+    requestAnimationFrame(animate);
+    meshGroup.rotation.y += 0.003; // دوران المشهد
+    renderer.render(scene, camera);
+}
+
+// البداية
+buildMode();
+animate();
+
+window.addEventListener('resize', () => {
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+});
+</script>
+</body>
+</html>
