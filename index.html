@@ -991,20 +991,18 @@ console.log('%c𓂀 ⚔️ 🐉 بركة والتنين الصيني','font-size
         let sumR = 0;
         let losslessCount = 0;
         let sampleLogs = [];
-
-<!-- بداية وحدة مختبر DNA المدمجة (معزولة تماماً عن تنسيقات موقعك) -->
+<!-- بداية وحدة مختبر DNA المدمجة (نسخة مستقرة ومُصححة) -->
 <script src="https://cloudflare.com"></script>
 <script src="https://jsdelivr.net"></script>
 
 <style>
-  /* عدّل هذه المتغيرات الأربعة فقط لتطابق ألوان موقعك الحالي */
   #bzis-dna-embed {
-    --bzis-bg: #0f172a;          /* لون خلفية البطاقة الرئيسية (اجعله transparent ليأخذ لون موقعك) */
-    --bzis-surface: #020617;     /* لون خلفية الحقول وشاشة النتائج */
-    --bzis-primary: #0284c7;     /* اللون الأساسي لموقعك (الأزرار والعناوين) */
-    --bzis-accent: #10b981;      /* اللون الثانوي (مؤشرات النجاح والتوازن) */
-    --bzis-text: #f8fafc;        /* لون النصوص الأساسية */
-    --bzis-muted: #94a3b8;       /* لون النصوص الفرعية */
+    --bzis-bg: #0f172a;
+    --bzis-surface: #020617;
+    --bzis-primary: #0284c7;
+    --bzis-accent: #10b981;
+    --bzis-text: #f8fafc;
+    --bzis-muted: #94a3b8;
     --bzis-border: rgba(148, 163, 184, 0.22);
 
     max-width: 1040px;
@@ -1014,13 +1012,12 @@ console.log('%c𓂀 ⚔️ 🐉 بركة والتنين الصيني','font-size
     border: 1px solid var(--bzis-border);
     border-radius: 18px;
     color: var(--bzis-text);
-    font-family: inherit; /* يرث خط موقعك تلقائياً */
+    font-family: inherit;
     direction: rtl;
     text-align: right;
     box-sizing: border-box;
   }
 
-  /* وضع المظهر الفاتح التلقائي إذا كان موقعك ذا خلفية بيضاء */
   #bzis-dna-embed.bzis-light-mode {
     --bzis-bg: #ffffff;
     --bzis-surface: #f8fafc;
@@ -1281,24 +1278,34 @@ console.log('%c𓂀 ⚔️ 🐉 بركة والتنين الصيني','font-size
 
   function transform(seq, t, seed) {
     let x = Math.sin(t + seed), y = Math.cos(t * 1.6180339), z = Math.sin(t * 2.7182818);
-    let out = "", pts = [];
+    let out = "", pts = new Array();
     for (let i = 0; i < seq.length; i++) {
       const b = B2N.get(seq.charAt(i));
       if (b === undefined) continue;
-      const pn = PRIMES[i % PRIMES.length];
+      const pn = PRIMES.at(i % PRIMES.length);
       const phi = (Math.PI / 2) * b;
       x = (x + Math.sin(pn * y + t + phi) * 0.137) % (2 * Math.PI);
       y = (y + Math.cos(pn * z - t) * 0.137) % (2 * Math.PI);
       z = (z + Math.sin(pn * x + t * t) * 0.137) % (2 * Math.PI);
       const shift = Math.floor(Math.abs((x + y + z) * 1e5) * pn) % 4;
-      const nb = BASES[(b + shift) % 4];
+      const nb = BASES.at((b + shift) % 4);
       out += nb;
       pts.push({ x: Math.cos(x) * 4.2, y: Math.sin(y) * 3.2, z: Math.cos(z) * 4.2, base: nb });
     }
-    return { encoded: out, pts };
+    return { encoded: out, pts: pts };
   }
 
   function invert(enc, t, seed) {
+    let x = Math.sin(t + seed), y = Math.cos(t * 1.6180339), z = Math.sin(t * 2.7182818);
+    let res = "";
+    for (let i = 0; i < enc.length; i++) {
+      const ev = B2N.get(enc.charAt(i));
+      if (ev === undefined) continue;
+      const pn = PRIMES.at(i % PRIMES.length);
+      for (let c = 0; c < 4; c++) {
+        const phi = (Math.PI / 2) * c;
+        const nx = (x + Math.sin(pn * y + t + phi) * 0.137) % (2 * Math.PI);
+
 
 </body>
 </html>إضافة قسم تجربة تشفير الملفات السيادية — PFE Pro
