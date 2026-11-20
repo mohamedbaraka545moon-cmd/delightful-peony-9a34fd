@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baraka Multiverse Explorer | مستكشف الأكوان المتوازية</title>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
+        
+        #canvas-container { width: 100vw; height: 100vh; display: block; }
+        
+        .hud {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 30px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+        }
+
+        .title {
+            color: #d4af37;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(212,175,55,0.5);
+            font-family: 'Georgia', serif;
+        }
+
+        .author {
+            color: #888;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        .controls {
+            pointer-events: auto;
+            display: flex;
+            gap: 15px;
+            padding: 20px 30px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: 1px solid #d4af37;
+            background: rgba(212,175,55,0.1);
+            color: #d4af37;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 14px;
+            backdrop-filter: blur(5px);
+        }
+
+        button:hover {
+            background: #d4af37;
+            color: #000;
+            box-shadow: 0 0 20px rgba(212,175,55,0.6);
+            transform: translateY(-2px);
+        }
+
+        .info-panel {
+            position: absolute;
+            top: 100px;
+            right: 30px;
+            width: 300px;
+            background: rgba(10, 13, 20, 0.8);
+            border: 1px solid #1e293b;
+            border-right: 4px solid #38bdf8;
+            padding: 20px;
+            border-radius: 8px;
+            color: #ccc;
+            pointer-events: auto;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-panel h3 {
+            color: #38bdf8;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .info-panel p { font-size: 13px; line-height: 1.6; }
+        .info-panel .val { color: #d4af37; font-family: monospace; font-weight: bold; }
+        
+        .loader {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #d4af37;
+            font-size: 20px;
+            letter-spacing: 2px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+    <div class="loader" id="loader">جاري خلق الكون...</div>
+
+    <div class="hud">
+        <div class="top-bar">
+            <div>
+                <div class="title">Baraka Multiverse Explorer</div>
+                <div class="author">الأستاذ / محمد عيد عبد العليم بركة</div>
+            </div>
+        </div>
+
+        <div class="info-panel" id="infoPanel">
+            <h3>🌌 بيانات الكون الحالي</h3>
+            <p>الهوية (C): <span class="val" id="hudC">0.00</span></p>
+            <p>النجوم (أولية): <span class="val" id="hudPrimes">0</span></p>
+            <p>الغبار (مركبة): <span class="val" id="hudComposites">0</span></p>
+            <p style="margin-top:10px; color:#94a3b8; font-size:12px;">
+                اسحب بالماوس لتدوير الكون، واستخدم العجلة للتقريب.
+            </p>
+        </div>
+
+        <div class="controls">
+            <button onclick="spawnUniverse()">✨ خلق كون جديد</button>
+            <button onclick="collapseUniverse()">💥 إحداث تصادم (كسر R=0)</button>
+            <button onclick="resetView()">🔄 إعادة ضبط الكاميرا</button>
+        </div>
+    </div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// SETUP
+// ═══════════════════════════════════════════════════════════════
+const container = document.getElementById('canvas-container');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+container.appendChild(renderer.domElement);
+
+camera.position.set(0, 0, 50);
+
+// ═══════════════════════════════════════════════════════════════
+// MOUSE CONTROLS (Custom Orbit)
+// ═══════════════════════════════════════════════════════════════
+let isDragging = false;
+let previousMousePosition = { x: 0, y: 0 };
+let targetRotation = { x: 0, y: 0 };
+
+container.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    previousMousePosition = { x: e.clientX, y: e.clientY };
+});
+
+container.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const deltaMove = {
+        x: e.clientX - previousMousePosition.x,
+        y: e.clientY - previousMousePosition.y
+    };
+    targetRotation.x += deltaMove.y * 0.005;
+    targetRotation.y += deltaMove.x * 0.005;
+    previousMousePosition = { x: e.clientX, y: e.clientY };
+});
+
+container.addEventListener('mouseup', () => isDragging = false);
+container.addEventListener('mouseleave', () => isDragging = false);
+
+// Zoom
+container.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    camera.position.z += e.deltaY * 0.05;
+    camera.position.z = Math.max(10, Math.min(200, camera.position.z));
+}, { passive: false });
+
+// ═══════════════════════════════════════════════════════════════
+// MATH FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+function isPrime(n) {
+    if (n < 2) return false;
+    if (n === 2) return true;
+    if (n % 2 === 0) return false;
+    for (let i = 3; i <= Math.sqrt(n); i += 2) {
+        if (n % i === 0) return false;
+    }
+    return true;
+}
+
+function gamma(x) {
+    if (x < 0.5) return Math.PI / (Math.sin(Math.PI * x) * gamma(1 - x));
+    const g = 7;
+    const C = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+    x -= 1;
+    let a = C[0];
+    const t = x + g + 0.5;
+    for (let i = 1; i < g + 2; i++) a += C[i] / (x + i);
+    return Math.sqrt(2 * Math.PI) * Math.pow(t, x + 0.5) * Math.exp(-t) * a;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UNIVERSE GENERATOR
+// ═══════════════════════════════════════════════════════════════
+let currentUniverse = new THREE.Group();
+scene.add(currentUniverse);
+
+function createUniverse(C) {
+    // مسح الكون القديم
+    while(currentUniverse.children.length > 0){ 
+        currentUniverse.remove(currentUniverse.children[0]); 
+    }
+
+    const primesGeo = new THREE.BufferGeometry();
+    const compositesGeo = new THREE.BufferGeometry();
+    
+    const primesPos = [];
+    const compositesPos = [];
+    
+    const scale = 30;
+    const numPoints = 3000;
+    let primeCount = 0;
+    let compositeCount = 0;
+
+    for (let i = 1; i <= numPoints; i++) {
+        // الزاوية تعتمد على المعادلة الأم
+        let phi = Math.PI * (gamma(i / 10) + 1) / (i / 10) + C;
+        
+        // إحداثيات كروية
+        let r = 15 + Math.sin(phi) * 10;
+        let theta = i * 0.1 + C;
+        let p = Math.acos(2 * Math.random() - 1); // زاوية عشوائية موزعة
+
+        let x = r * Math.sin(p) * Math.cos(theta);
+        let y = r * Math.sin(p) * Math.sin(theta);
+        let z = r * Math.cos(p);
+
+        if (isPrime(i)) {
+            primesPos.push(x, y, z);
+            primeCount++;
+        } else {
+            compositesPos.push(x, y, z);
+            compositeCount++;
+        }
+    }
+
+    // --- رسم النجوم الأولية (ذهبية) ---
+    primesGeo.setAttribute('position', new THREE.Float32BufferAttribute(primesPos, 3));
+    const primesMat = new THREE.PointsMaterial({ 
+        color: 0xffd700, 
+        size: 0.8, 
+        transparent: true, 
+        opacity: 0.9,
+        blending: THREE.AdditiveBlending
+    });
+    const primesPoints = new THREE.Points(primesGeo, primesMat);
+    currentUniverse.add(primesPoints);
+
+    // --- رسم الغبار المركب (سماوي) ---
+    compositesGeo.setAttribute('position', new THREE.Float32BufferAttribute(compositesPos, 3));
+    const compositesMat = new THREE.PointsMaterial({ 
+        color: 0x38bdf8, 
+        size: 0.4, 
+        transparent: true, 
+        opacity: 0.4,
+        blending: THREE.AdditiveBlending
+    });
+    const compositesPoints = new THREE.Points(compositesGeo, compositesMat);
+    currentUniverse.add(compositesPoints);
+
+    // تحديث الـ HUD
+    document.getElementById('hudC').textContent = C.toFixed(2);
+    document.getElementById('hudPrimes').textContent = primeCount;
+    document.getElementById('hudComposites').textContent = compositeCount;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════════════════════════════
+function spawnUniverse() {
+    const loader = document.getElementById('loader');
+    loader.style.display = 'block';
+    
+    // توليد C عشوائي
+    const newC = Math.random() * Math.PI * 2;
+    
+    setTimeout(() => {
+        createUniverse(newC);
+        loader.style.display = 'none';
+    }, 100);
+}
+
+function collapseUniverse() {
+    // تأثير التصادم (تحطيم R=0)
+    let scaleFactor = 1;
+    const collapseInterval = setInterval(() => {
+        scaleFactor -= 0.05;
+        currentUniverse.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        
+        if (scaleFactor <= 0.1) {
+            clearInterval(collapseInterval);
+            // تجميع الشظايا (إعادة التوليد)
+            setTimeout(() => {
+                currentUniverse.scale.set(1, 1, 1);
+                spawnUniverse();
+            }, 500);
+        }
+    }, 30);
+}
+
+function resetView() {
+    targetRotation = { x: 0, y: 0 };
+    camera.position.set(0, 0, 50);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ANIMATION LOOP
+// ═══════════════════════════════════════════════════════════════
+function animate() {
+    requestAnimationFrame(animate);
+
+    // دوران سلس
+    currentUniverse.rotation.x += (targetRotation.x - currentUniverse.rotation.x) * 0.05;
+    currentUniverse.rotation.y += (targetRotation.y - currentUniverse.rotation.y) * 0.05;
+    
+    // دوران تلقائي بطيء
+    if (!isDragging) {
+        currentUniverse.rotation.y += 0.002;
+    }
+
+    renderer.render(scene, camera);
+}
+
+// Initialize
+createUniverse(1.618); // نبدأ بالنسبة الذهبية
+animate();
+
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>
