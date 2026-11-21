@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baraka Neural Network | الذكاء الاصطناعي الحتمي</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #050508; --panel: #111827; --border: #1e293b;
+            --text: #e5e7eb; --text-muted: #94a3b8;
+            --gold: #d4af37; --cyan: #38bdf8; --purple: #a855f7;
+            --success: #10b981; --danger: #ef4444;
+        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; padding: 24px 16px; display: flex; flex-direction: column; align-items: center; }
+        
+        header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid var(--gold); padding-bottom: 20px; width: 100%; max-width: 900px; }
+        header h1 { font-size: 28px; color: var(--gold); margin-bottom: 10px; }
+        header p { color: var(--text-muted); font-size: 15px; }
+        
+        .dashboard { display: flex; gap: 30px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 30px; width: 100%; max-width: 900px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); flex-wrap: wrap; }
+        
+        .input-section { flex: 1; min-width: 250px; }
+        .input-section h3 { color: var(--cyan); margin-bottom: 15px; font-size: 18px; }
+        
+        .grid-3x3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 240px; margin-bottom: 20px; }
+        .cell { width: 70px; height: 70px; background: #000; border: 2px solid var(--border); border-radius: 10px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: transparent; }
+        .cell:hover { border-color: var(--cyan); }
+        .cell.active { background: rgba(56, 189, 248, 0.2); border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
+        
+        .controls { margin-top: 20px; }
+        .controls label { display: block; color: var(--gold); font-size: 14px; margin-bottom: 8px; font-weight: bold; }
+        .controls input[type="range"] { width: 100%; accent-color: var(--gold); }
+        
+        .visual-section { flex: 1.5; min-width: 300px; position: relative; background: #000; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        canvas { display: block; }
+        
+        .result-box { margin-top: 20px; text-align: center; padding: 20px; background: rgba(0,0,0,0.5); border: 2px dashed var(--border); border-radius: 12px; }
+        .result-box h4 { color: var(--text-muted); font-size: 14px; margin-bottom: 10px; }
+        .result-box .output { font-size: 32px; font-weight: bold; color: var(--cyan); }
+        
+        .legend { display: flex; justify-content: center; gap: 20px; margin-top: 15px; font-size: 13px; color: var(--text-muted); }
+        .legend span { display: flex; align-items: center; gap: 6px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        
+        @media (max-width: 700px) { .dashboard { flex-direction: column; } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Baraka Neural Network (BNN)</h1>
+        <p>شبكة عصبية حتمية بالكامل (R=0) — أوزانها مستمدة من المعادلة الأم، وليست عشوائية.</p>
+    </header>
+
+    <div class="dashboard">
+        <div class="input-section">
+            <h3>1. ارسم النمط (Inputs)</h3>
+            <div class="grid-3x3" id="grid">
+                <!-- 9 cells -->
+            </div>
+            
+            <div class="controls">
+                <label>2. الهوية المدبرة (ثابت التكامل C): <span id="cVal" style="color:#fff;">1.618</span></label>
+                <input type="range" id="cSlider" min="0.1" max="5.0" step="0.001" value="1.618">
+            </div>
+            
+            <div class="legend">
+                <span><div class="dot" style="background:var(--cyan);"></div> وزن موجب (تنشيط)</span>
+                <span><div class="dot" style="background:var(--danger);"></div> وزن سالب (تثبيط)</span>
+            </div>
+        </div>
+
+        <div class="visual-section">
+            <canvas id="nnCanvas" width="400" height="400"></canvas>
+        </div>
+    </div>
+
+    <div class="result-box" style="width: 100%; max-width: 900px;">
+        <h4>مخرجات الشبكة (نسبة الثقة)</h4>
+        <div class="output" id="outputText">في انتظار الرسم...</div>
+        <div style="display: flex; justify-content: center; gap: 40px; margin-top: 15px;">
+            <div>
+                <div style="color: var(--text-muted); font-size: 12px;">حرف X</div>
+                <div id="outX" style="color: var(--gold); font-size: 20px; font-weight: bold;">0%</div>
+            </div>
+            <div>
+                <div style="color: var(--text-muted); font-size: 12px;">حرف O</div>
+                <div id="outO" style="color: var(--purple); font-size: 20px; font-weight: bold;">0%</div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// BARAKA NEURAL NETWORK ENGINE
+// ═══════════════════════════════════════════════════════════════
+const gridEl = document.getElementById('grid');
+const cSlider = document.getElementById('cSlider');
+const cVal = document.getElementById('cVal');
+const canvas = document.getElementById('nnCanvas');
+const ctx = canvas.getContext('2d');
+const outputText = document.getElementById('outputText');
+const outX = document.getElementById('outX');
+const outO = document.getElementById('outO');
+
+let inputs = new Array(9).fill(0);
+let C = 1.618;
+let weights = [];
+
+// --- دوال رياضية (المعادلة الأم) ---
+function gammaFn(z) {
+    if (z < .5) return Math.PI / (Math.sin(Math.PI * z) * gammaFn(1 - z));
+    z -= 1;
+    const g = 7, C_arr = [.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+    let x = C_arr[0];
+    for (let i = 1; i < g + 2; i++) x += C_arr[i] / (z + i);
+    const t = z + g + .5;
+    return Math.sqrt(2 * Math.PI) * Math.pow(t, z + .5) * Math.exp(-t) * x;
+}
+
+// دالة توليد الوزن بناءً على المعادلة الأم
+function getBarakaWeight(i, j, C_val) {
+    // نستخدم الزاوية المبنية على المعادلة: Phi(t) = t + (Gamma(t)+1)/t
+    // نضيف C_val كطور (Phase Shift)
+    let t = (i + 1) * (j + 1) * 0.1; // قيم صغيرة لتجنب الانفجار
+    let phi = t + (gammaFn(t) + 1) / t + C_val;
+    
+    // النواة: y = -sin^2(phi) / cosh(t)
+    let y = -Math.pow(Math.sin(phi), 2) / Math.cosh(t);
+    
+    // نضيف z لزيادة التعقيد
+    let z = -Math.pow(Math.cos(phi), 2) / Math.cosh(t);
+    
+    // النتيجة النهائية: دمج y و z (يمكن أن تكون سالبة أو موجبة)
+    // نستخدم دالة tanh لتقييد القيمة بين -1 و 1
+    return Math.tanh(y * 10 + z * 5);
+}
+
+// --- بناء الشبكة ---
+function buildGrid() {
+    for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.index = i;
+        cell.addEventListener('click', () => {
+            inputs[i] = inputs[i] === 0 ? 1 : 0;
+            cell.classList.toggle('active');
+            cell.textContent = inputs[i] === 1 ? '•' : '';
+            runNetwork();
+        });
+        gridEl.appendChild(cell);
+    }
+}
+
+function updateWeights() {
+    C = parseFloat(cSlider.value);
+    cVal.textContent = C.toFixed(3);
+    
+    // طبقة مخفية: 9 مدخلات -> 6 خلايا
+    // طبقة مخرجات: 6 خلايا -> 2 مخرجات (X, O)
+    weights = {
+        in_hidden: [], // 9x6
+        hidden_out: [] // 6x2
+    };
+    
+    for (let i = 0; i < 9; i++) {
+        weights.in_hidden[i] = [];
+        for (let j = 0; j < 6; j++) {
+            weights.in_hidden[i][j] = getBarakaWeight(i, j, C);
+        }
+    }
+    
+    for (let i = 0; i < 6; i++) {
+        weights.hidden_out[i] = [];
+        for (let j = 0; j < 2; j++) {
+            weights.hidden_out[i][j] = getBarakaWeight(i + 10, j + 20, C);
+        }
+    }
+}
+
+// --- تشغيل الشبكة (Forward Pass) ---
+function runNetwork() {
+    updateWeights();
+    
+    // 1. حساب الطبقة المخفية
+    let hidden = new Array(6).fill(0);
+    for (let j = 0; j < 6; j++) {
+        let sum = 0;
+        for (let i = 0; i < 9; i++) {
+            sum += inputs[i] * weights.in_hidden[i][j];
+        }
+        // دالة تنشيط (ReLU)
+        hidden[j] = Math.max(0, sum);
+    }
+    
+    // 2. حساب المخرجات
+    let outputs = new Array(2).fill(0);
+    for (let k = 0; k < 2; k++) {
+        let sum = 0;
+        for (let j = 0; j < 6; j++) {
+            sum += hidden[j] * weights.hidden_out[j][k];
+        }
+        outputs[k] = sum;
+    }
+    
+    // 3. تحويل المخرجات إلى احتمالات (Softmax) — رغم أن الأوزان حتمية، إلا أننا نحتاج لعرضها كنسبة مئوية
+    let expX = Math.exp(outputs[0]);
+    let expO = Math.exp(outputs[1]);
+    let sumExp = expX + expO;
+    let probX = (expX / sumExp) * 100;
+    let probO = (expO / sumExp) * 100;
+    
+    // عرض النتائج
+    outX.textContent = probX.toFixed(1) + '%';
+    outO.textContent = probO.toFixed(1) + '%';
+    
+    if (probX > 60) {
+        outputText.textContent = "النتيجة: حرف X (X)";
+        outputText.style.color = "var(--gold)";
+    } else if (probO > 60) {
+        outputText.textContent = "النتيجة: حرف O (O)";
+        outputText.style.color = "var(--purple)";
+    } else {
+        outputText.textContent = "النتيجة: غير محدد (تحتاج رسم أوضح)";
+        outputText.style.color = "var(--text-muted)";
+    }
+    
+    drawNetwork(hidden);
+}
+
+// --- رسم الشبكة ---
+function drawNetwork(hidden) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const inputX = 50;
+    const hiddenX = 200;
+    const outputX = 350;
+    
+    // إحداثيات المدخلات
+    let inputY = [];
+    for (let i = 0; i < 9; i++) {
+        inputY.push(40 + i * 40);
+    }
+    
+    // إحداثيات المخفية
+    let hiddenY = [];
+    for (let i = 0; i < 6; i++) {
+        hiddenY.push(70 + i * 50);
+    }
+    
+    // إحداثيات المخرجات
+    let outputY = [150, 250];
+    
+    // رسم الخطوط (الأوزان)
+    for (let i = 0; i < 9; i++) {
+        for (let j = 0; j < 6; j++) {
+            let w = weights.in_hidden[i][j];
+            if (Math.abs(w) < 0.1) continue; // تجاهل الأوزان الضعيفة
+            
+            ctx.beginPath();
+            ctx.moveTo(inputX, inputY[i]);
+            ctx.lineTo(hiddenX, hiddenY[j]);
+            ctx.strokeStyle = w > 0 ? `rgba(56, 189, 248, ${Math.abs(w)})` : `rgba(239, 68, 68, ${Math.abs(w)})`;
+            ctx.lineWidth = Math.abs(w) * 3;
+            ctx.stroke();
+        }
+    }
+    
+    for (let j = 0; j < 6; j++) {
+        for (let k = 0; k < 2; k++) {
+            let w = weights.hidden_out[j][k];
+            if (Math.abs(w) < 0.1) continue;
+            
+            ctx.beginPath();
+            ctx.moveTo(hiddenX, hiddenY[j]);
+            ctx.lineTo(outputX, outputY[k]);
+            ctx.strokeStyle = w > 0 ? `rgba(56, 189, 248, ${Math.abs(w)})` : `rgba(239, 68, 68, ${Math.abs(w)})`;
+            ctx.lineWidth = Math.abs(w) * 3;
+            ctx.stroke();
+        }
+    }
+    
+    // رسم العقد (Nodes)
+    // المدخلات
+    for (let i = 0; i < 9; i++) {
+        ctx.beginPath();
+        ctx.arc(inputX, inputY[i], 8, 0, Math.PI * 2);
+        ctx.fillStyle = inputs[i] === 1 ? "var(--cyan)" : "#333";
+        ctx.fill();
+        ctx.strokeStyle = "#666";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+    }
+    
+    // المخفية
+    for (let j = 0; j < 6; j++) {
+        ctx.beginPath();
+        ctx.arc(hiddenX, hiddenY[j], 10, 0, Math.PI * 2);
+        ctx.fillStyle = hidden[j] > 0 ? `rgba(16, 185, 129, ${Math.min(hidden[j], 1)})` : "#333";
+        ctx.fill();
+        ctx.strokeStyle = "#10b981";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
+    
+    // المخرجات
+    for (let k = 0; k < 2; k++) {
+        ctx.beginPath();
+        ctx.arc(outputX, outputY[k], 12, 0, Math.PI * 2);
+        ctx.fillStyle = k === 0 ? "var(--gold)" : "var(--purple)";
+        ctx.fill();
+    }
+    
+    // نصوص المخرجات
+    ctx.fillStyle = "#fff";
+    ctx.font = "12px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("X", outputX, outputY[0] - 20);
+    ctx.fillText("O", outputX, outputY[1] - 20);
+}
+
+// مستمعات الأحداث
+cSlider.addEventListener('input', runNetwork);
+
+// التشغيل الأولي
+buildGrid();
+// تفعيل نمط حرف X افتراضي لرؤية النتيجة
+const defaultX = [0, 2, 4, 6, 8];
+defaultX.forEach(i => {
+    document.querySelectorAll('.cell')[i].click();
+});
+</script>
+</body>
+</html>
