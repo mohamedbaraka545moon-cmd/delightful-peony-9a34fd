@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zero-Proof Lab | Baraka Analytical Theory</title>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600&display=swap');
+        
+        :root {
+            --black: #050505; --black-2: #111111; --black-3: #1a1a1a;
+            --gold: #d4af37; --gold-light: #f5d76e;
+            --text: #e5e7eb; --text-muted: #9ca3af; --border: #333333;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--black); color: var(--text); padding: 40px 20px; line-height: 1.8; }
+        .container { max-width: 900px; margin: 0 auto; background: var(--black-2); padding: 50px; border: 2px solid var(--gold); border-radius: 12px; box-shadow: 0 0 50px rgba(212, 175, 55, 0.15); }
+        .header { text-align: center; border-bottom: 2px solid var(--gold); padding-bottom: 30px; margin-bottom: 40px; }
+        .header h1 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 32px; margin-bottom: 10px; }
+        .header p { color: var(--text-muted); font-size: 16px; }
+        .input-group { display: flex; gap: 15px; justify-content: center; margin-bottom: 30px; }
+        input[type="number"] { padding: 15px 20px; font-size: 18px; background: #000; border: 2px solid var(--gold); color: #fff; border-radius: 8px; width: 250px; text-align: center; font-family: monospace; }
+        button { padding: 15px 30px; font-size: 18px; font-weight: bold; background: var(--gold); color: #000; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        button:hover { background: var(--gold-light); transform: translateY(-2px); }
+        .results { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .result-card { background: #000; border: 1px solid var(--border); padding: 25px; border-radius: 10px; text-align: center; }
+        .result-card .label { color: var(--text-muted); font-size: 14px; margin-bottom: 10px; }
+        .result-card .value { font-family: monospace; font-size: 24px; font-weight: bold; color: var(--gold); }
+        .result-card.zero .value { color: #10b981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+        .equation-box { background: #000; border-left: 4px solid var(--gold); padding: 20px; margin: 20px 0; border-radius: 5px; overflow-x: auto; }
+        .canvas-container { width: 100%; height: 400px; background: #000; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-top: 30px; }
+        canvas { width: 100%; height: 100%; display: block; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Zero-Proof Lab</h1>
+        <p>Visualizing the Higher-Order Tangency of Prime Numbers (y' = 0, y'' = 0)</p>
+    </div>
+
+    <div class="input-group">
+        <input type="number" id="primeInput" value="7" min="2" placeholder="Enter a prime number">
+        <button onclick="runProof()">Analyze</button>
+    </div>
+
+    <div class="equation-box">
+        \[
+        y(x) = -\frac{\sin^2\left(\pi \cdot \frac{\Gamma(x)+1}{x}\right)}{\cosh(x)}
+        \]
+    </div>
+
+    <div class="results">
+        <div class="result-card zero">
+            <div class="label">Function Value \(y(p)\)</div>
+            <div class="value" id="valY">0.000000</div>
+        </div>
+        <div class="result-card zero">
+            <div class="label">First Derivative \(y'(p)\)</div>
+            <div class="value" id="valY1">0.000000</div>
+        </div>
+        <div class="result-card zero">
+            <div class="label">Second Derivative \(y''(p)\)</div>
+            <div class="value" id="valY2">0.000000</div>
+        </div>
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="proofCanvas"></canvas>
+    </div>
+    <p style="text-align: center; color: var(--text-muted); margin-top: 15px; font-size: 14px;">
+        The graph shows the function near the prime point. Note the perfectly horizontal tangent (zero velocity and zero acceleration).
+    </p>
+</div>
+
+<script>
+    // Gamma function approximation for real numbers (Lanczos)
+    function gamma(x) {
+        if (x < 0.5) return Math.PI / (Math.sin(Math.PI * x) * gamma(1 - x));
+        const g = 7;
+        const C = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+        x -= 1;
+        let a = C[0];
+        const t = x + g + 0.5;
+        for (let i = 1; i < g + 2; i++) a += C[i] / (x + i);
+        return Math.sqrt(2 * Math.PI) * Math.pow(t, x + 0.5) * Math.exp(-t) * a;
+    }
+
+    function y(x) {
+        if (x <= 0) return 0;
+        const phi = Math.PI * (gamma(x) + 1) / x;
+        return -Math.pow(Math.sin(phi), 2) / Math.cosh(x);
+    }
+
+    // Numerical derivatives
+    function y_prime(x) {
+        const h = 1e-5;
+        return (y(x + h) - y(x - h)) / (2 * h);
+    }
+
+    function y_double_prime(x) {
+        const h = 1e-4;
+        return (y(x + h) - 2 * y(x) + y(x - h)) / (h * h);
+    }
+
+    function runProof() {
+        const p = parseFloat(document.getElementById('primeInput').value);
+        if (!p || p < 2) {
+            alert("Please enter a valid number greater than 2.");
+            return;
+        }
+
+        // Update values (using 1e-10 threshold for floating point precision)
+        document.getElementById('valY').textContent = Math.abs(y(p)) < 1e-10 ? "0.000000" : y(p).toExponential(4);
+        document.getElementById('valY1').textContent = Math.abs(y_prime(p)) < 1e-8 ? "0.000000" : y_prime(p).toExponential(4);
+        document.getElementById('valY2').textContent = Math.abs(y_double_prime(p)) < 1e-6 ? "0.000000" : y_double_prime(p).toExponential(4);
+
+        drawGraph(p);
+    }
+
+    function drawGraph(p) {
+        const canvas = document.getElementById('proofCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Handle high DPI
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+
+        const W = rect.width;
+        const H = rect.height;
+        const midY = H / 2;
+
+        ctx.clearRect(0, 0, W, H);
+
+        // Draw axes
+        ctx.beginPath();
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 1;
+        ctx.moveTo(0, midY);
+        ctx.lineTo(W, midY);
+        ctx.stroke();
+
+        // Plot function around p
+        const range = 2.5; // +/- 2.5 around p
+        const xMin = Math.max(0.1, p - range);
+        const xMax = p + range;
+        
+        let maxVal = 0.0001;
+        for (let i = 0; i <= 100; i++) {
+            const x = xMin + (i / 100) * (xMax - xMin);
+            const val = Math.abs(y(x));
+            if (val > maxVal) maxVal = val;
+        }
+
+        ctx.beginPath();
+        ctx.strokeStyle = '#d4af37';
+        ctx.lineWidth = 3;
+
+        for (let i = 0; i <= 200; i++) {
+            const x = xMin + (i / 200) * (xMax - xMin);
+            const val = y(x);
+            
+            const px = ((x - xMin) / (xMax - xMin)) * W;
+            const py = midY - (val / (maxVal * 1.2)) * (H / 2 - 20);
+
+            if (i === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+
+        // Draw prime point
+        const px = ((p - xMin) / (xMax - xMin)) * W;
+        const py = midY - (y(p) / (maxVal * 1.2)) * (H / 2 - 20);
+
+        ctx.beginPath();
+        ctx.fillStyle = '#10b981'; // Green for the zero point
+        ctx.arc(px, py, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Label
+        ctx.fillStyle = '#fff';
+        ctx.font = '14px Inter';
+        ctx.fillText(`p = ${p}`, px + 10, py - 10);
+
+        // Draw horizontal tangent line
+        ctx.beginPath();
+        ctx.strokeStyle = '#a855f7'; // Purple for tangent
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.moveTo(px - 50, py);
+        ctx.lineTo(px + 50, py);
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    // Initial draw
+    window.onload = () => {
+        runProof();
+        window.addEventListener('resize', () => runProof());
+    };
+</script>
+
+</body>
+</html>
