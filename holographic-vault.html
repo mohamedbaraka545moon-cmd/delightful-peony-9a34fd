@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holographic Vault | الخزنة الكونية</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap');
+        :root { --bg: #050505; --panel: #111; --border: #333; --text: #e5e7eb; --muted: #9ca3af; --gold: #d4af37; --cyan: #38bdf8; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); padding: 40px 20px; line-height: 1.8; }
+        .container { max-width: 800px; margin: 0 auto; background: var(--panel); padding: 40px; border: 2px solid var(--gold); border-radius: 12px; box-shadow: 0 0 40px rgba(212,175,55,0.1); }
+        header { text-align: center; border-bottom: 2px solid var(--gold); padding-bottom: 20px; margin-bottom: 30px; }
+        header h1 { color: var(--gold); font-size: 28px; }
+        header p { color: var(--muted); font-size: 14px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 30px; }
+        .tab { flex: 1; padding: 12px; background: #000; border: 1px solid var(--border); color: var(--muted); text-align: center; cursor: pointer; border-radius: 8px; font-weight: bold; }
+        .tab.active { background: rgba(212,175,55,0.1); border-color: var(--gold); color: var(--gold); }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: var(--cyan); font-weight: bold; font-size: 14px; }
+        input[type="text"], input[type="file"], input[type="number"] { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); color: #fff; border-radius: 8px; font-family: inherit; }
+        button { width: 100%; padding: 15px; background: var(--gold); color: #000; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #ffd700; }
+        canvas { width: 100%; height: auto; border: 1px solid var(--border); border-radius: 8px; margin-top: 20px; display: none; }
+        .result { margin-top: 20px; padding: 15px; background: #000; border: 1px dashed var(--cyan); color: var(--cyan); font-family: monospace; word-break: break-all; border-radius: 8px; display: none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Holographic Vault</h1>
+        <p>إخفاء البيانات داخل الصور باستخدام المعادلة الأم (R=0 Steganography)</p>
+    </header>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('hide')">إخفاء النص (Hide)</div>
+        <div class="tab" onclick="switchTab('extract')">استخراج النص (Extract)</div>
+    </div>
+
+    <!-- إخفاء -->
+    <div id="hidePanel">
+        <div class="form-group">
+            <label>1. اختر صورة (PNG صغيرة)</label>
+            <input type="file" id="imageInput" accept="image/png">
+        </div>
+        <div class="form-group">
+            <label>2. النص السري (Secret Text)</label>
+            <input type="text" id="secretText" placeholder="اكتب النص السري هنا...">
+        </div>
+        <div class="form-group">
+            <label>3. ثابت التكامل C (المفتاح)</label>
+            <input type="number" id="cHide" value="1.618" step="0.001">
+        </div>
+        <button onclick="hideData()">🔐 إخفاء النص في الصورة</button>
+        <canvas id="canvasHide"></canvas>
+        <div class="result" id="hideResult"></div>
+    </div>
+
+    <!-- استخراج -->
+    <div id="extractPanel" style="display:none;">
+        <div class="form-group">
+            <label>1. اختر الصورة المخفية</label>
+            <input type="file" id="extractImageInput" accept="image/png">
+        </div>
+        <div class="form-group">
+            <label>2. ثابت التكامل C (المفتاح)</label>
+            <input type="number" id="cExtract" value="1.618" step="0.001">
+        </div>
+        <button onclick="extractData()">🔓 استخراج النص السري</button>
+        <canvas id="canvasExtract"></canvas>
+        <div class="result" id="extractResult"></div>
+    </div>
+</div>
+
+<script>
+    // دالة جاما
+    function gamma(z) {
+        if (z < 0.5) return Math.PI / (Math.sin(Math.PI * z) * gamma(1 - z));
+        const g = 7, C = [0.9999999999999999, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+        z -= 1; let a = C[0];
+        const t = z + g + 0.5;
+        for (let i = 1; i < g + 2; i++) a += C[i] / (z + i);
+        return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * a;
+    }
+
+    // توليد مسار حتمي للبكسلات
+    function getPixelIndex(i, C_val, totalPixels) {
+        const t = 1.0 + i * 0.01;
+        const u = Math.PI * (gamma(t) + 1) / t + C_val;
+        const y = -Math.pow(Math.sin(u), 2) / Math.cosh(t);
+        // تحويل الناتج إلى مؤشر بكسل
+        return Math.abs(Math.floor(y * 10000)) % totalPixels;
+    }
+
+    function switchTab(tab) {
+        document.getElementById('hidePanel').style.display = tab === 'hide' ? 'block' : 'none';
+        document.getElementById('extractPanel').style.display = tab === 'extract' ? 'block' : 'none';
+        document.querySelectorAll('.tab').forEach((t, i) => {
+            t.classList.toggle('active', (tab === 'hide' && i === 0) || (tab === 'extract' && i === 1));
+        });
+    }
+
+    function hideData() {
+        const file = document.getElementById('imageInput').files[0];
+        const text = document.getElementById('secretText').value;
+        const C_val = parseFloat(document.getElementById('cHide').value);
+        
+        if (!file || !text) return alert("اختر صورة واكتب نصاً سرياً");
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.getElementById('canvasHide');
+                canvas.style.display = 'block';
+                canvas.width = img.width; canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+
+                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imgData.data;
+                const totalPixels = data.length / 4;
+
+                // تحويل النص إلى بتات
+                const binaryText = text.split('').map(char => char.charCodeAt(0).toString(2).padStart(8, '0')).join('') + '00000000'; // إنهاء
+                
+                if (binaryText.length > totalPixels) {
+                    return alert("الصورة صغيرة جداً لإخفاء هذا النص!");
+                }
+
+                // إخفاء البتات في القنوات الزرقاء (LSB) بناءً على المعادلة
+                for (let i = 0; i < binaryText.length; i++) {
+                    const pixelIndex = getPixelIndex(i, C_val, totalPixels);
+                    const dataIndex = pixelIndex * 4 + 2; // القناة الزرقاء
+                    
+                    // نجعل الرقم زوجياً إذا كان البت 0، وفردياً إذا كان 1
+                    data[dataIndex] = (data[dataIndex] & 254) | parseInt(binaryText[i]);
+                }
+
+                ctx.putImageData(imgData, 0, 0);
+                document.getElementById('hideResult').style.display = 'block';
+                document.getElementById('hideResult').innerHTML = `✅ تم الإخفاء بنجاح!<br>احفظ الصورة بالضغط عليها بزر الماوس الأيمن واختيار "حفظ الصورة باسم".<br>تذكر: مفتاح الاستخراج هو C = ${C_val}`;
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function extractData() {
+        const file = document.getElementById('extractImageInput').files[0];
+        const C_val = parseFloat(document.getElementById('cExtract').value);
+        if (!file) return alert("اختر الصورة المخفية");
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.getElementById('canvasExtract');
+                canvas.style.display = 'block';
+                canvas.width = img.width; canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+
+                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imgData.data;
+                const totalPixels = data.length / 4;
+
+                let binaryText = '';
+                for (let i = 0; i < totalPixels; i++) {
+                    const pixelIndex = getPixelIndex(i, C_val, totalPixels);
+                    const dataIndex = pixelIndex * 4 + 2;
+                    binaryText += (data[dataIndex] & 1).toString();
+                    
+                    // التحقق من وجود 8 بتات وإذا كانت صفراً (نهاية النص)
+                    if (binaryText.length % 8 === 0 && binaryText.length > 0) {
+                        const byte = binaryText.slice(-8);
+                        if (byte === '00000000') {
+                            binaryText = binaryText.slice(0, -8); // إزالة بت النهاية
+                            break;
+                        }
+                    }
+                }
+
+                // تحويل البتات إلى نص
+                let resultText = '';
+                for (let i = 0; i < binaryText.length; i += 8) {
+                    const byte = binaryText.slice(i, i + 8);
+                    resultText += String.fromCharCode(parseInt(byte, 2));
+                }
+
+                document.getElementById('extractResult').style.display = 'block';
+                if (resultText.trim() === '') {
+                    document.getElementById('extractResult').innerHTML = `❌ لم يتم العثور على نص. تأكد من صحة المفتاح C.`;
+                } else {
+                    document.getElementById('extractResult').innerHTML = `🔓 النص السري: <br><strong style="color:#fff;font-size:20px;">${resultText}</strong>`;
+                }
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+</script>
+</body>
+</html>
