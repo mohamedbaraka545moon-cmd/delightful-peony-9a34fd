@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deterministic Quantum Orbital | Baraka Theory</title>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap');
+        :root { --bg: #050508; --panel: #111827; --border: #1e293b; --text: #e5e7eb; --text-muted: #94a3b8; --gold: #d4af37; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        header { text-align: center; padding: 20px; background: rgba(0,0,0,0.8); border-bottom: 2px solid var(--gold); z-index: 10; }
+        header h1 { color: var(--gold); font-size: 24px; margin-bottom: 5px; }
+        header p { color: var(--text-muted); font-size: 14px; }
+        #canvas-container { flex-grow: 1; position: relative; background: radial-gradient(circle at center, #0a1122 0%, #000 100%); }
+        canvas { display: block; }
+        .controls { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(17, 24, 39, 0.9); border: 1px solid var(--gold); padding: 15px 30px; border-radius: 12px; text-align: center; width: 80%; max-width: 500px; z-index: 10; backdrop-filter: blur(10px); }
+        .controls label { display: block; color: var(--gold); font-weight: bold; margin-bottom: 10px; }
+        .controls input[type="range"] { width: 100%; accent-color: var(--gold); cursor: pointer; }
+        .controls .val { color: #fff; font-family: monospace; font-size: 18px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Deterministic Quantum Orbital</h1>
+        <p>مدار الإلكترون الحتمي (R=0) بدون أي احتمالات كمومية</p>
+    </header>
+    <div id="canvas-container"></div>
+    <div class="controls">
+        <label>ثابت التكامل C (مستوى الطاقة):</label>
+        <input type="range" id="cSlider" min="0.1" max="10.0" step="0.01" value="1.618">
+        <div class="val" id="cVal">C = 1.618</div>
+    </div>
+
+<script>
+    // إعداد المشهد
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
+    camera.position.set(0, 0, 20);
+
+    // إضاءة
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    const light = new THREE.PointLight(0xd4af37, 2, 50);
+    light.position.set(0, 0, 0);
+    scene.add(light);
+
+    // النواة (البروتون)
+    const nucleusGeo = new THREE.SphereGeometry(0.5, 32, 32);
+    const nucleusMat = new THREE.MeshBasicMaterial({ color: 0xd4af37 });
+    const nucleus = new THREE.Mesh(nucleusGeo, nucleusMat);
+    scene.add(nucleus);
+
+    // الإلكترون (نقطة)
+    const electronGeo = new THREE.SphereGeometry(0.15, 16, 16);
+    const electronMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+    const electron = new THREE.Mesh(electronGeo, electronMat);
+    scene.add(electron);
+
+    // خط المدار
+    const trailGeo = new THREE.BufferGeometry();
+    const trailMat = new THREE.LineBasicMaterial({ color: 0xa855f7, transparent: true, opacity: 0.5 });
+    const trail = new THREE.Line(trailGeo, trailMat);
+    scene.add(trail);
+
+    // دالة جاما التقريبية
+    function gamma(z) {
+        if (z < 0.5) return Math.PI / (Math.sin(Math.PI * z) * gamma(1 - z));
+        const g = 7, C = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+        z -= 1;
+        let a = C[0];
+        const t = z + g + 0.5;
+        for (let i = 1; i < g + 2; i++) a += C[i] / (z + i);
+        return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * a;
+    }
+
+    let C_param = 1.618;
+    let t = 1.0;
+    const trailPoints = [];
+
+    document.getElementById('cSlider').addEventListener('input', (e) => {
+        C_param = parseFloat(e.target.value);
+        document.getElementById('cVal').textContent = `C = ${C_param.toFixed(3)}`;
+        trailPoints.length = 0; // مسح المسار القديم
+        t = 1.0; // إعادة الزمن
+    });
+
+    function animate() {
+        requestAnimationFrame(animate);
+        
+        t += 0.05;
+        if (t > 50) t = 1.0; // إعادة الدورة
+
+        // المعادلة الأم
+        const u = Math.PI * (gamma(t) + 1) / t + C_param;
+        const y = -Math.pow(Math.sin(u), 2) / Math.cosh(t);
+        const z = -Math.pow(Math.cos(u), 2) / Math.cosh(t);
+
+        // تحويل الإحداثيات لتناسب العرض ثلاثي الأبعاد
+        const scale = 30;
+        const px = y * scale;
+        const py = z * scale;
+        const pz = Math.sin(t) * 5; // إضافة بعد ثالث للدوران
+
+        electron.position.set(px, py, pz);
+
+        // تحديث المسار
+        trailPoints.push(new THREE.Vector3(px, py, pz));
+        if (trailPoints.length > 300) trailPoints.shift();
+        
+        const positions = new Float32Array(trailPoints.length * 3);
+        trailPoints.forEach((p, i) => {
+            positions[i*3] = p.x;
+            positions[i*3+1] = p.y;
+            positions[i*3+2] = p.z;
+        });
+        trail.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+        // تدوير المشهد
+        scene.rotation.y += 0.005;
+        scene.rotation.x += 0.002;
+
+        renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    animate();
+</script>
+</body>
+</html>
